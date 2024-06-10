@@ -4,7 +4,7 @@
 
     <el-button type="primary" @click="showUserAddDialog" style="margin: 15px 0;">+新增</el-button>
     <!-- 列表显示用户 -->
-    <el-table :data="userlist" border style="width: 100%" max-height="250">
+    <el-table :data="userlist" border style="width: 100%" max-height="750">
       <el-table-column prop="username" label="用户名">
       </el-table-column>
       <el-table-column prop="gender" label="性别">
@@ -20,12 +20,12 @@
       <el-table-column prop="update_time" label="修改时间" show-overflow-tooltip>
       </el-table-column>
       <el-table-column label="操作" header-align="center">
-        <template slot-scope="scope">
+        <template v-slot:default="{ row, $index }">
           <div class="handler flex-center">
-            <el-button type="warning" @click.native.prevent.stop="openUpdateUser(scope.$index, userlist)">
+            <el-button type="warning" @click.native.prevent.stop="openUpdateUser($index, userlist)">
               修改
             </el-button>
-            <el-button @click.native.prevent="delUser(scope.$index, userlist)" type="danger">
+            <el-button @click.native.prevent="delUser($index, userlist)" type="danger">
               删除
             </el-button>
           </div>
@@ -61,8 +61,14 @@
         </el-form-item>
         <el-form-item label="性别" prop="gender">
           <el-radio-group v-model="userAddForm.gender" class="ml-4">
-            <el-radio label="1">男</el-radio>
-            <el-radio label="2">女</el-radio>
+            <el-radio label=0>男</el-radio>
+            <el-radio label=1>女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="管理员" prop="is_admin">
+          <el-radio-group v-model="userAddForm.is_admin" class="ml-4">
+            <el-radio label=0>是</el-radio>
+            <el-radio label=1>否</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -75,12 +81,31 @@
         </span>
       </template>
     </el-dialog>
+
+  <!-- 修改密码对话框 -->
+  <el-dialog v-model="userUpdateDialogVisible" title="修改密码" width="30%">
+    <el-form ref="passwordFormRef" :model="passwordForm" :rules="passwordRules" label-width="100px">
+      <el-form-item label="新密码" prop="newPassword">
+        <el-input type="password" v-model="passwordForm.new_password" autocomplete="off" placeholder="请输入新密码"></el-input>
+      </el-form-item>
+      <el-form-item label="确认密码" prop="confirmPassword">
+        <el-input type="password" v-model="passwordForm.confirmPassword" autocomplete="off" placeholder="请再次输入新密码"></el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="userUpdateDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="updatePassword">确定</el-button>
+      </span>
+    </template>
+  </el-dialog>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { addUser_API, getUserList_API } from '@/api/user'; // 从api文件夹导入接口
-import { reactive, ref } from 'vue';
+import { addUser_API, getUserList_API, updatePassword_API, deleteUser_API } from '@/api/user'; // 从api文件夹导入接口
+import { reactive, ref, onMounted } from 'vue';
 import { FormInstance, FormRules } from 'element-plus';
 
 const userAddDialogVisible = ref(false);
@@ -90,8 +115,18 @@ const userAddForm = ref({
   userpwdagain: '',
   phone: '',
   email: '',
-  gender: ''
+  gender: 0,
+  is_admin: 0,
 });
+
+
+// 当组件挂载后执行一次getUserList函数
+onMounted(async () => {
+  await getUserList();
+});
+
+// 定义 userlist 为响应式数组
+const userlist = ref([]);
 
 const userAddFormRef = ref<FormInstance>();
 
@@ -103,8 +138,10 @@ const currentPage = ref(1); // 当前页码
 const getUserList = async () => {
   try {
     const response = await getUserList_API(currentPage.value, pageSize.value); // 调用获取用户列表的接口
-    userlist.value = response.data; // 更新用户列表
-    total.value = response.total; // 更新总记录数
+
+    userlist.value = response.data.data.content; // 更新用户列表
+    total.value = response.data.data.totalElements; // 更新总记录数
+
   } catch (error) {
     console.error(error);
   }
@@ -152,14 +189,40 @@ const rules = reactive<FormRules>({
   ],
   gender: [
     { required: true, message: '请选择性别', trigger: 'change' }
+  ],
+  is_admin: [
+    { required: true, message: '请选择是否是管理员', trigger: 'change' }
   ]
 });
 
-
+// 修改密码的表单验证规则
+const passwordRules = {
+  new_password: [
+    { required: true, message: '请输入新密码', trigger: 'blur' },
+    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+  ],
+  confirmPassword: [
+    { required: true, message: '请再次输入新密码', trigger: 'blur' },
+    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' },
+    { validator: (rule, value, callback) => {
+      if (value !== passwordForm.new_password) {
+        callback(new Error('两次输入的密码不一致'));
+      } else {
+        callback();
+      }
+    }, trigger: 'blur' }
+  ],
+};
 
 const resetUserAddForm = () => {
   if (userAddFormRef.value) {
     userAddFormRef.value.resetFields();
+  }
+};
+
+const resetPasswordForm = () => {
+  if (passwordFormRef.value) {
+    passwordFormRef.value.resetFields();
   }
 };
 
@@ -174,6 +237,9 @@ const addUser = async () => {
       if (isValid) {
         console.log(userAddForm.value)
         const response = await addUser_API(userAddForm.value); // 调用添加用户接口
+        userAddDialogVisible.value = false
+        getUserList()
+        resetUserAddForm()
         //接收返回信息
         console.log(response)
       }
@@ -182,6 +248,67 @@ const addUser = async () => {
     }
   }
 };
+
+// 更新用户对话框的可见性和表单
+const userUpdateDialogVisible = ref(false);
+
+// 修改密码表单的引用
+const passwordFormRef = ref();
+
+// 修改密码表单的数据
+const passwordForm = reactive({
+  userid: 0,
+  new_password: '',
+  confirmPassword: '',
+});
+
+// 打开更新用户对话框，并预填充表单
+const openUpdateUser = (index: number, userlist: Array<any>) => {
+
+  userUpdateDialogVisible.value = true;
+  passwordForm.userid = userlist[index].id;
+};
+
+
+// 更新密码的方法
+const updatePassword = async () => {
+  if (passwordFormRef.value) {
+    try {
+      const isValid = await passwordFormRef.value.validate();
+      if (isValid) {
+
+
+        // 调用修改密码的 API，传入新密码
+        const response = await updatePassword_API(passwordForm);
+        userUpdateDialogVisible.value = false;
+        // 清空表单
+        resetPasswordForm();
+        // 根据返回信息处理结果，例如显示成功信息或处理错误
+        console.log(response);
+        
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+};
+
+// 删除用户
+const delUser = async (index: number, userlist: Array<any>) => {
+  const user = userlist[index];
+  try {
+    // 调用删除用户的 API，传入用户的唯一标识，例如用户ID
+    console.log(user.id)
+    await deleteUser_API(user.id);
+    // 删除成功后，更新用户列表
+    userlist.splice(index, 1);
+    getUserList();
+  } catch (error) {
+    console.error(error);
+    // 处理删除失败的情况，例如显示错误消息
+  }
+};
+
 </script>
 
 <style scoped>

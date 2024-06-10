@@ -1,4 +1,5 @@
 import type { LoginForm, RegisterForm, AddUserForm } from "@/models/auth"
+import type { UpdatePasswordForm } from "@/models/user"
 import request from "@/utils/request"
 import qs from "qs"
 
@@ -28,3 +29,13 @@ export const getUserList_API = (page: number, size: number) => {
     headers: { 'Content-Type': 'application/json' }
   });
 };
+
+// 修改用户接口
+export const updatePassword_API = (data: UpdatePasswordForm) => {
+  return request.post('/user/setpassword', JSON.stringify(data), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+};
+
+// 删除用户接口
+export const deleteUser_API = (userid: number) => {return request.post('/user/delete/' + userid);};

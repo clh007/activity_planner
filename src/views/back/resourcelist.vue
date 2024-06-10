@@ -46,8 +46,8 @@
         <el-form-item label="资源名称" prop="name">
           <el-input v-model="resourceAddForm.name" autocomplete="off" placeholder="请输入资源名称"></el-input>
         </el-form-item>
-        <el-form-item label="资源类型" prop="type">
-          <el-input v-model="resourceAddForm.type" autocomplete="off" placeholder="请输入资源类型"></el-input>
+        <el-form-item label="资源类型" prop="type_id">
+          <el-input v-model="resourceAddForm.type_id" autocomplete="off" placeholder="请输入资源类型"></el-input>
         </el-form-item>
         <el-form-item label="总数量" prop="total_num">
           <el-input v-model="resourceAddForm.total_num" autocomplete="off" placeholder="请输入总数量"></el-input>
@@ -76,7 +76,7 @@ import { FormInstance, FormRules } from 'element-plus';
 const resourceAddDialogVisible = ref(false);
 const resourceAddForm = ref({
   name: '',
-  type: '',
+  type_id: 1,
   total_num: 0,
   current_num: 0
 });
@@ -118,7 +118,7 @@ const rules = reactive<FormRules>({
   ],
   type: [
     { required: true, message: '请输入资源类型', trigger: 'blur' },
-    { min: 3, max: 20, message: '资源类型长度应在 3 到 20 个字符', trigger: 'blur' }
+    { type: 'number', message: '资源类型长度应在 3 到 20 个字符', trigger: 'blur' }
   ],
   total_num: [
     { required: true, message: '请输入总数量', trigger: 'blur' },

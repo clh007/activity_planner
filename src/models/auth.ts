@@ -17,5 +17,6 @@ export interface AddUserForm {
     userpwdagain: string
     phone?: string
     email?: string
-    gender: string
+    gender: number
+    is_admin: number
 }

@@ -19,7 +19,7 @@
             </el-icon>
             <span>活动管理</span>
           </template>
-          <el-menu-item @click="router.push({ name: 'activitylist' })" index="2-1">活动模板</el-menu-item>
+          <el-menu-item @click="router.push({ name: 'activitytemplate' })" index="2-1">活动模板</el-menu-item>
           <el-menu-item @click="router.push({ name: 'activitylist' })" index="2-2">所有活动</el-menu-item>
         </el-sub-menu>
         <el-menu-item index="3">

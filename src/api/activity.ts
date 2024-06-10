@@ -25,6 +25,7 @@ export const fetchAllActivitiesPub_API = () => {
 export const fetchAllActivitiesPar_API = () => {
     return request.get(`/activity/parByUser`);
 };
+
 export const fetchActivitiesByKeyPub_API = (key: string) => {
     const queryParams = `?search_key=${key}`
     return request.get('/activity/userSearchPub' + queryParams)
@@ -33,10 +34,12 @@ export const fetchActivitiesByKeyPar_API = (key: string) => {
     const queryParams = `?search_key=${key}`
     return request.get('/activity/userSearchPar' + queryParams)
 }
+
 export const updateActivity_API = (activity: Activity) => {
-    return request.put('/activity/update', JSON.stringify(activity))
+    return request.post('/activity/update', JSON.stringify(activity))
 }
 
+//删除活动
 export const deleteActivity_API = (id: number) => {
     const queryParams = `?id=${id}`
     return request.delete('/activity/delete' + queryParams)
@@ -44,4 +47,26 @@ export const deleteActivity_API = (id: number) => {
 
 export const getActivity_API = (id: number) => {
     return request.get(`/activity/get?id=${id}`)
+}
+
+//后台添加活动
+export const addActivity_API = (activity: Activity) => {
+    return request.post('/activity/add', JSON.stringify(activity))
+}
+
+//列出所有活动
+export const getActivityList_API = (activity: Activity) => {
+    return request.post('/activity/list', JSON.stringify(activity))
+}
+
+//关键字查询活动
+export const getActivityListByKeyword_API = (type: string, keyword: string, page: number, size: number) => {
+    return request.post('/resource/search', {
+        type: type,
+        keyword: keyword,
+        page: page,
+        size: size
+    }, {
+        headers: { 'Content-Type': 'application/json' }
+    });
 }

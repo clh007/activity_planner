@@ -80,6 +80,11 @@ const routes = [
                         name: "activitylist",
                         component: () => import('@/views/back/activitylist.vue'),
                     },
+                    {
+                        path: "activitytemplate",
+                        name: "activitytemplate",
+                        component: () => import('@/views/back/activitytemplate.vue'),
+                    }
                 ],
             },
         ]

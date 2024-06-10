@@ -13,10 +13,12 @@ declare module 'vue' {
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElBacktop: typeof import('element-plus/es')['ElBacktop']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElCard: typeof import('element-plus/es')['ElCard']
     ElCarousel: typeof import('element-plus/es')['ElCarousel']
     ElCarouselItem: typeof import('element-plus/es')['ElCarouselItem']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
     ElDialog: typeof import('element-plus/es')['ElDialog']
+    ElDrawer: typeof import('element-plus/es')['ElDrawer']
     ElDropdown: typeof import('element-plus/es')['ElDropdown']
     ElDropdownItem: typeof import('element-plus/es')['ElDropdownItem']
     ElDropdownMenu: typeof import('element-plus/es')['ElDropdownMenu']
@@ -29,12 +31,16 @@ declare module 'vue' {
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElPagination: typeof import('element-plus/es')['ElPagination']
+    ElPopover: typeof import('element-plus/es')['ElPopover']
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
+    ElTimeline: typeof import('element-plus/es')['ElTimeline']
+    ElTimelineItem: typeof import('element-plus/es')['ElTimelineItem']
+    ElUpload: typeof import('element-plus/es')['ElUpload']
     JoinerList: typeof import('./src/components/joinerList.vue')['default']
     Printer: typeof import('./src/components/printer.vue')['default']
     ResourceApply: typeof import('./src/components/resourceApply.vue')['default']
@@ -43,5 +49,8 @@ declare module 'vue' {
     Timeline: typeof import('./src/components/timeline.vue')['default']
     Topbar: typeof import('./src/components/topbar.vue')['default']
     Uploadpicture: typeof import('./src/components/uploadpicture.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vInfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']
   }
 }

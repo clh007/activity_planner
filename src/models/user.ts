@@ -8,3 +8,9 @@ export interface currentUser {
     create_time: string;
     update_time: string;
 }
+
+export interface UpdatePasswordForm{
+    userid: number;
+    new_password: string;
+    confirmPassword: string;
+}

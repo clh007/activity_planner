@@ -7,7 +7,7 @@ import { ref, watch } from 'vue';
 const router = useRouter()
 const webInfoStore = useWebInfoStore()
 const { is_login, topbar } = storeToRefs(webInfoStore)
-
+const search_key = ref('')
 const logout = () => {
   webInfoStore.logout()
   router.push('/login')
@@ -24,6 +24,16 @@ watch(scrollTop, (newscrollTop, oldscrollTop) => {
     topbar_visible: up
   })
 })
+
+const navToSearch = () => {
+  router.push({
+    name: 'search',
+    params: {
+      key: search_key.value
+    }
+  })
+  search_key.value = ''
+}
 </script>
 
 <template>
@@ -48,8 +58,8 @@ watch(scrollTop, (newscrollTop, oldscrollTop) => {
           <span>个人界面</span>
         </li>
         <li class="search-bar myCenter">
-          <el-input />
-          <el-icon size="25px" @click="router.push('/')" class="search-icon">
+          <el-input v-model="search_key" placeholder="搜索活动" class="search-input" />
+          <el-icon size="25px" @click="navToSearch()" class="search-icon">
             <Search />
           </el-icon>
         </li>

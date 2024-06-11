@@ -64,20 +64,32 @@
                     <h3 class="display-title">
                         活动列表
                     </h3>
-                    <div class="display-container">
-                        <div v-for="item in home_activities" class="card">
-                            <div class="card-img">
-                                <el-image :src="item.image" fit="cover" class="card-img-content"></el-image>
+                    <ul class="display-container">
+                        <li v-for="item in home_activities" class="card">
+                            <div class="card-img" @click="router.push({ name: 'activity', params: { id: item.id } })">
+                                <el-image :src="item.picture" fit="cover" class="card-img-content"></el-image>
                             </div>
                             <div class="card-info">
-                                <h3 class="activity-title">
-                                    {{ item.title }}
+                                <h3 class="activity-title"
+                                    @click="router.push({ name: 'activity', params: { id: item.id } })">
+                                    {{ item.name }}
                                 </h3>
                                 <p class="activity-content">
-                                    {{ item.content }}
+                                    {{ item.info }}
                                 </p>
                             </div>
-                        </div>
+                        </li>
+                    </ul>
+                    <div class="nextPage" @click="loadHomeActivities()" v-if="nextPage">
+                        <span v-if="!isloading">
+                            下一页
+                        </span>
+                        <span v-else>
+                            加载中
+                        </span>
+                    </div>
+                    <div class="no-more" v-else>
+                        ~~到底了~~
                     </div>
                 </div>
             </div>
@@ -86,17 +98,22 @@
 </template>
 
 <script setup lang="ts">
+import { getActivityListPage_API } from '@/api/activity';
+import type { Activity } from '@/models/avtivity';
 import { ArrowDown, DArrowRight, Reading } from '@element-plus/icons-vue'
-import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 const url = 'https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load'
 const printInfo = ref("2024 05 23")
 
+const router = useRouter()
 const hot_activities = [{ title: "1", content: "111111", image: "https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" },
 { title: "2", content: "2222", image: "https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" },]
 
 const sys_message = [{
     title: "系统公告1",
-    content: "我在睡觉，别打扰我11111111111111111111111111111111111111111111111111111111111111111111111111111111",
+    content: "我在睡觉,别打扰我11111111111111111111111111111111111111111111111111111111111111111111111111111111",
 }, {
     title: "系统公告2",
     content: "我在睡觉，别打扰我",
@@ -104,13 +121,8 @@ const sys_message = [{
     title: "系统公告3",
     content: "我在睡觉，别打扰我",
 }]
-const home_activities =
-    [{ title: "1", content: "111111", image: "https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" },
-    { title: "2", content: "2222", image: "https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg" },
-    { title: "2", content: "2222", image: "https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg" },
-    { title: "2", content: "2222", image: "https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg" },
-    { title: "2", content: "2222", image: "https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg" },
-    { title: "2", content: "2222", image: "https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg" }]
+
+const nextPage = ref(true)
 
 const navication = (id: string) => {
     document.querySelector(id)?.scrollIntoView({
@@ -119,19 +131,59 @@ const navication = (id: string) => {
         inline: 'nearest',
     })
 }
+const home_activities = ref<Activity[]>([]);
+const curPage = ref(0)
+const pageSize = ref(9)
+
+const loadHomeActivities = () => {
+    if (isloading.value === true) {
+        ElMessage.warning('加载中')
+        return
+    }
+    isloading.value = true
+    curPage.value += 1
+    getActivityListPage_API(curPage.value, pageSize.value)
+        .then((res) => {
+            if (res.data.code === 200)
+                if (res.data.data.length === 0) {
+                    nextPage.value === false
+                } else {
+                    home_activities.value.push(...res.data.data)
+                }
+            else {
+
+            }
+        })
+        .catch((err) => {
+            if (curPage.value < 3) {
+                for (let i = (curPage.value - 1) * pageSize.value; i < curPage.value * pageSize.value; i++) {
+                    home_activities.value.push({
+                        id: i,
+                        name: 'planner' + i,
+                        picture: 'https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg',
+                        info: 'lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit',
+                    })
+                }
+            }
+            else {
+                nextPage.value = false
+            }
+            isloading.value = false
+        })
+}
+onMounted(() => {
+    loadHomeActivities()
+})
+
+const isloading = ref(false)
+
 </script>
 
 <style scoped>
-/* #region li样式reset */
-ul li {
-    list-style: none;
-}
-
-/* #endregion */
-
 /* #region  home*/
 .home {
     width: 100vw;
+    overflow: auto;
 }
 
 /* #endregion */
@@ -303,7 +355,6 @@ ul li {
 /* #region main*/
 .main-display {
     width: 100%;
-    height: 200vh;
 }
 
 .display-title {
@@ -312,18 +363,43 @@ ul li {
 
 .display-container {
     display: flex;
-
     flex-wrap: wrap;
 }
 
 .card {
-    flex: 33%;
-    margin: 10px auto;
+    box-sizing: border-box;
+    width: 27vw;
+    padding: 10px 5px;
 }
 
 .card-img {
-    width: 20vw;
+    width: 100%;
+}
 
+.card-img,
+.activity-title {
+    cursor: pointer;
+}
+
+.activity-content {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.nextPage,
+.no-more {
+    text-align: center;
+}
+
+.nextPage {
+    cursor: pointer;
+}
+
+.nextPage:hover {
+    color: #409eff;
 }
 
 /* #endregion*/

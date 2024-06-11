@@ -11,6 +11,8 @@ import './assets/css/index.css'
 import './assets/css/color.css'
 import './assets/css/animation.css'
 
+import '@/utils/changeTitle'
+
 const app = createApp(App)
 app.use(createPinia().use(piniaPluginPersistedState))
     .use(router)

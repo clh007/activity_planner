@@ -61,6 +61,11 @@ const routes = [
                 component: () => import("@/views/activity/index.vue")
             },
             {
+                path: "/search/:key",
+                name: "search",
+                component: () => import("@/views/home/search.vue")
+            },
+            {
                 path: "/back",
                 name: "back",
                 component: () => import('@/views/back/index.vue'),

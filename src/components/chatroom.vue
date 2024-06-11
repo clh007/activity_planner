@@ -23,19 +23,20 @@
                         {{ item.content }}
                     </div>
                     <div v-if="item.type === 'img'" class="msg-content" :style="{ 'background-color': msgBgColor }">
-                        <el-image :src="'' + item.content"></el-image>
+                        <el-image :src="item.content"></el-image>
                     </div>
                     <div v-if="item.type === 'file'" class="msg-content msg-file"
-                        :style="{ 'background-color': msgBgColor }">
+                        :style="{ 'background-color': msgBgColor }" @click="downloadFile(item.content)">
                         <el-icon>
                             <Folder />
                         </el-icon>
-                        {{ item.content.substring(item.content.indexOf('-') + 1) }}
+                        <span>[点击下载]</span>
+                        <div>{{ item.content.substring(item.content.indexOf('-') + 1) }}</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="room-footer">
+        <div class=" room-footer">
             <div class="inbar">
                 <el-popover placement="top" title="我的表情包">
                     <template #reference>
@@ -103,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch, type VNodeRef } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { UploadFilled, Folder } from '@element-plus/icons-vue'
 import { ElMessage, type UploadInstance, type UploadProps, type UploadRequestOptions } from 'element-plus';
 const message = ref("")
@@ -197,7 +198,7 @@ const chatMessages = ref([
         id: 1,
         name: '张三',
         avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: '你好啊.jpg',
+        content: 'https://www.bilibili.com/favicon.ico?v=1',
         type: "file",
         time: '2024-05-25 12:00:00'
     },
@@ -358,6 +359,9 @@ const ScrollToBottom = () => {
         room_main.value?.scrollTo({ top: room_main.value.scrollHeight, behavior: "smooth" })
     })
 }
+const downloadFile = (url: string) => {
+    window.open(url)
+}
 let username = window.btoa(encodeURI(currentUser.value.name))
 const peopleNumber = ref<number>(0)
 const chatroom_drawer = defineModel('chatroom_drawer',
@@ -429,7 +433,6 @@ const getOneMessage = (msg: string, type: string) => {
 
 <style scoped>
 .chatroom {
-    width: 45vw;
     height: 80vh;
     padding: 10px;
     background: #894444;
@@ -517,6 +520,10 @@ const getOneMessage = (msg: string, type: string) => {
     word-break: break-all;
     color: black;
     float: left;
+}
+
+.msg-file {
+    cursor: pointer;
 }
 
 .msg-time {

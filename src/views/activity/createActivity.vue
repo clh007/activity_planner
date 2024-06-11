@@ -26,27 +26,12 @@
                 <span>活动地点</span>
                 <el-input v-model="activity.location" placeholder="请输入活动地点"></el-input>
             </div>
-            <div class="content">
-                <span>活动日程</span>
-                <el-button @click="drawer = true">添加日程</el-button>
-                <el-table :data="scheduleList" style="width: 100%">
-                    <el-table-column prop="name" label="日程名" width="180" />
-                    <el-table-column prop="start_time" label="开始时间" width="180" />
-                    <el-table-column prop="end_time" label="结束时间" width="180" />
-                    <el-table-column label="操作">
-                        <template #default="scope">
-                            <el-button type="warning" @click.prevent="deleteSchedule(scope.$index)">删除</el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </div>
+
             <div class="activity-button">
                 <el-button type="primary" @click="createActivity">创建活动</el-button>
             </div>
         </div>
-        <el-drawer size="40%" v-model="drawer" title="添加一个日程" :direction="direction" :before-close="handleClose">
-            <addSchedule v-model:drawer="drawer" />
-        </el-drawer>
+
     </div>
 </template>
 
@@ -54,7 +39,6 @@
 import type { Activity_template, Activity } from '@/models/avtivity';
 import { ElMessage } from 'element-plus';
 import { onMounted, ref, watch } from 'vue'
-import addSchedule from "@/components/addSchedule.vue"
 const temp_select = ref('自定义')
 
 watch(
@@ -139,20 +123,6 @@ const createActivity = () => {
     ElMessage.success('创建活动成功')
 }
 
-const drawer = ref(false)
-const direction = ref('rtl')
-const handleClose = (done: () => void) => {
-    done();
-};
-
-import { useScheduleStore } from '@/store/schedule';
-import { storeToRefs } from 'pinia';
-
-const { scheduleList } = storeToRefs(useScheduleStore())
-
-const deleteSchedule = (index: number) => {
-    useScheduleStore().deleteSchedule(index)
-}
 </script>
 
 <style scoped>

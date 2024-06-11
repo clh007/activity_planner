@@ -22,8 +22,10 @@ import { ref } from 'vue';
 import type { Schedule } from "@/models/schedule"
 import { useScheduleStore } from '@/store/schedule';
 import { ElMessage } from 'element-plus';
+import { addSchedule_API } from '@/api/activity';
 
 const drawer = defineModel('drawer')
+const act_id = defineModel('act_id', { default: 0 })
 
 const schedule = ref<Schedule>({
     context: '',
@@ -42,13 +44,18 @@ const addSchedule = () => {
         ElMessage.error("请选择日程时间")
         return
     }
+    schedule.value.activity_id = act_id.value
     schedule.value.start_time = start_end.value[0]
     schedule.value.end_time = start_end.value[1]
     schedule.value.context = context.value
-    if (!useScheduleStore().addSchedule(schedule.value)) {
-        ElMessage.error("添加失败,与已有日程冲突")
-        return
-    }
+    addSchedule_API(schedule.value)
+        .then(res => {
+            if (res.data.code === 200) {
+                ElMessage.success("添加成功")
+            }
+        })
+        .catch(err => {
+        })
     context.value = ''
     start_end.value = ['', '']
     schedule.value = {

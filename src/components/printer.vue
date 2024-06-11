@@ -74,8 +74,6 @@ watch([working, printInfo], () => {
 watch(cursor, (newCursor) => {
     content.value = printInfo.value.slice(0, newCursor)
 })
-
-
 const start = (work) => {
     timeout.value = setTimeout(() => {
         timer.value = setInterval(() => {

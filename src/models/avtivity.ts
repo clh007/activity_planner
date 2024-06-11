@@ -3,10 +3,12 @@ export interface Activity {
     name: string,
     creator?: string,
     creator_id?: number,
+    username?: string,
     info: string,
+    picture?: string
     start_time?: string,
     end_time?: string,
-    location: string,
+    location?: string,
     state?: string,
     join_num?: number,
     max_num?: number,

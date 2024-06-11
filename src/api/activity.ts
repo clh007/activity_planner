@@ -1,4 +1,5 @@
 import type { Activity } from "@/models/avtivity";
+import type { Schedule } from "@/models/schedule";
 import request from "@/utils/request"
 import qs from "qs"
 
@@ -10,18 +11,12 @@ export const fetchActivityTemplates_API = (params?: any) => {
     return request.get(`/activity/templates${queryParams}`)
 };
 
-/**
- * 根据用户ID获取所有活动
- * 
- * 本函数通过调用请求模块的get方法，向服务器发送GET请求，以获取指定用户创建的所有活动信息。
- * 主要用于活动列表页面，展示特定用户创建的活动，为用户活动的查询提供接口。
- * 
- * @param creator_id 用户ID，作为查询参数，指定活动的创建者。
- * @returns 返回一个Promise，包含服务器响应的数据，通常是JSON格式。
- */
+
+// 当前用户创建的活动
 export const fetchAllActivitiesPub_API = () => {
     return request.get(`/activity/pubByUser`);
 };
+// 当前用户参与的活动
 export const fetchAllActivitiesPar_API = () => {
     return request.get(`/activity/parByUser`);
 };
@@ -34,7 +29,7 @@ export const fetchActivitiesByKeyPar_API = (key: string) => {
     const queryParams = `?search_key=${key}`
     return request.get('/activity/userSearchPar' + queryParams)
 }
-
+// 更新当前用户创建的活动
 export const updateActivity_API = (activity: Activity) => {
     return request.post('/activity/update', JSON.stringify(activity))
 }
@@ -59,6 +54,10 @@ export const getActivityList_API = (activity: Activity) => {
     return request.post('/activity/list', JSON.stringify(activity))
 }
 
+export const getActivityListPage_API = (curPage: number, pageSize: number) => {
+    return request.post('/activity/list')
+}
+
 //关键字查询活动
 export const getActivityListByKeyword_API = (type: string, keyword: string, page: number, size: number) => {
     return request.post('/resource/search', {
@@ -69,4 +68,20 @@ export const getActivityListByKeyword_API = (type: string, keyword: string, page
     }, {
         headers: { 'Content-Type': 'application/json' }
     });
+}
+
+
+// 获取活动日程列表
+export const getScheduleList_API = (id: number) => {
+    return request.get(`/activity/schedule/list?activity_id=${id}`)
+}
+
+// 添加活动日程
+export const addSchedule_API = (schedule: Schedule) => {
+    return request.post('/activity/schedule/add', JSON.stringify(schedule))
+}
+
+// 参加活动
+export const takePartActive_API = (id: number) => {
+    return request.get(`/activity/takePart?activity_id=${id}`)
 }

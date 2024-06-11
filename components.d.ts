@@ -42,6 +42,7 @@ declare module 'vue' {
     ElTimeline: typeof import('element-plus/es')['ElTimeline']
     ElTimelineItem: typeof import('element-plus/es')['ElTimelineItem']
     ElUpload: typeof import('element-plus/es')['ElUpload']
+    Feedback: typeof import('./src/components/feedback.vue')['default']
     JoinerList: typeof import('./src/components/joinerList.vue')['default']
     Printer: typeof import('./src/components/printer.vue')['default']
     ResourceApply: typeof import('./src/components/resourceApply.vue')['default']

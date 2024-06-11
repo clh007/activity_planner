@@ -2,29 +2,29 @@
     <div class="container">
         <div class="desc">
             <div class="img">
-                图片
+                <el-image src="https://www.bilibili.com/favicon.ico?v=1" style="width: 100%;height: 100%;" />
             </div>
             <div class="info">
                 <div class="title">
-                    <h3>title</h3>
+                    <h3>{{ activity.name }}</h3>
                 </div>
                 <div class="owner">
                     <span>组织者:</span>
-                    <span>李晓坤</span>
+                    <span>{{ activity.username }}</span>
                 </div>
                 <div class="time">
                     <span>起止时间</span>
-                    <p>1111111111</p>
+                    <p>{{ activity.start_time }} - {{ activity.end_time }}</p>
                 </div>
                 <div class="joiner_number">
                     <span>参与人数</span>
-                    <p>1111111111</p>
+                    <p>{{ activity.join_num }}</p>
                 </div>
                 <div class="activity-status">
                     <span>活动状态</span>
-                    <p>惊醒中</p>
+                    <p>{{ activity.state }}</p>
                 </div>
-                <el-button class="baoming" type="primary" style="width: 6vw;">参与活动</el-button>
+                <el-button class="take-part" type="primary" @click="takePartAct()">参与活动</el-button>
             </div>
             <el-button class="share" circle type="warning" :icon="Share">
             </el-button>
@@ -42,28 +42,35 @@
             <el-button @click="chatroom_drawer = true">进入聊天室</el-button>
             <el-button @click="joiner_drawer = true">成员列表</el-button>
         </div>
-        <div class="feedback">
-            <span>反馈区</span>
-            <el-input />
-            <ul v-infinite-scroll="loadFeedBack()" class="feedback-list" style="overflow: auto">
-                <li v-for="i in feedList" :key="i" class="infinite-list-item">{{ i }}</li>
-            </ul>
+        <div class="feedback-container">
+            <feedback v-model:act_id="act_id" />
         </div>
         <div class="timeline-container">
-            <el-drawer v-model="timeline_drawer" title="活动日程">
-                <timeline />
+            <el-drawer v-model="timeline_drawer" title="活动日程" size="40%">
+                <template #header>
+                    <div class="timeline-header">
+                        <div class="timeline-title">
+                            <span>活动日程</span>
+                        </div>
+                        <el-button type="info" @click="addSchedule_drawer = true" v-if="isCreator">添加日程</el-button>
+                    </div>
+                </template>
+                <timeline v-model:act_id="act_id" />
             </el-drawer>
         </div>
         <div class="chat-container">
-            <el-drawer v-model="chatroom_drawer" :with-header="false" title="聊天室" size="50%">
+            <el-drawer v-model="chatroom_drawer" :with-header="false" title="聊天室" size="40%">
                 <chatroom v-model:chatroom_drawer="chatroom_drawer" />
             </el-drawer>
         </div>
         <div class="join-container">
-            <el-drawer v-model="joiner_drawer" :with-header="false" title="聊天室" size="50%">
+            <el-drawer v-model="joiner_drawer" :with-header="false" title="聊天室" size="40%">
                 <joinerList v-model:act_id="act_id" />
             </el-drawer>
         </div>
+        <el-drawer size="40%" v-model="addSchedule_drawer" title="添加一个日程" direction="ltr">
+            <addSchedule v-model:act_id="act_id" v-model:drawer="addSchedule_drawer" />
+        </el-drawer>
     </div>
 </template>
 
@@ -72,37 +79,51 @@ import { Share } from '@element-plus/icons-vue'
 import chatroom from '@/components/chatroom.vue'
 import timeline from '@/components/timeline.vue'
 import joinerList from '@/components/joinerList.vue'
+import addSchedule from '@/components/addSchedule.vue'
 import { computed, onMounted, ref } from 'vue';
 import { useUserStore } from '@/store/user';
 import { storeToRefs } from 'pinia';
 import type { Activity } from '@/models/avtivity';
 import { useRouter } from 'vue-router';
-import { getActivity_API } from '@/api/activity';
+import { getActivity_API, takePartActive_API } from '@/api/activity';
+import { ElMessage } from 'element-plus'
 
 const { currentUser } = storeToRefs(useUserStore())
-
 const timeline_drawer = ref(false);
 const chatroom_drawer = ref(false);
 const joiner_drawer = ref(false);
-
+const addSchedule_drawer = ref(false)
 const activity = ref<Activity>({
     id: 0,
     name: '',
-    info: 'string',
-    location: 'string',
+    info: '',
+    location: '',
+})
+const isCreator = computed(() => {
+    return currentUser.value.id === activity.value.creator_id
 })
 const router = useRouter()
-const act_id = Number(router.currentRoute.value.params.id)
-
+const act_id = ref(Number(router.currentRoute.value.params.id))
 
 const getActivity = () => {
-    getActivity_API(act_id)
+    getActivity_API(act_id.value)
         .then((res) => {
             if (res.data.code === 200)
                 activity.value = res.data.data
         })
         .catch((err) => {
-            activity.value.creator_id = 0
+            activity.value = {
+                id: 0,
+                name: 'planner',
+                info: '你在干嘛哎呦',
+                location: '教室1',
+                start_time: '2022-05-01 00:00:00',
+                end_time: '2022-05-01 00:00:00',
+                username: '李晓坤',
+                join_num: 666,
+                state: '进行中',
+                creator_id: currentUser.value.id
+            }
         })
 }
 
@@ -110,17 +131,24 @@ onMounted(() => {
     getActivity()
 })
 
-const feedList = ref<[]>()
-
-const loadFeedBack = () => {
-
+const takePartAct = () => {
+    takePartActive_API(act_id.value)
+        .then((res) => {
+            if (res.data.code === 200) {
+                ElMessage.success('参与成功')
+            } else {
+                ElMessage.error(res.data.message)
+            }
+        })
+        .catch((err) => {
+            ElMessage.error('参与失败')
+        })
 }
 </script>
 
 <style scoped>
 .container {
-    height: 200vh;
-    padding: 60px 90px 0;
+    padding: 60px 20vw 0;
     display: flex;
     flex-direction: column;
     background: #e9e7e7;
@@ -211,6 +239,11 @@ const loadFeedBack = () => {
     display: flex;
 }
 
+.take-part {
+    width: 6vw;
+    margin-top: 12px;
+}
+
 /* #endregion */
 
 /* #region content*/
@@ -226,13 +259,8 @@ const loadFeedBack = () => {
     background: #a87575;
 }
 
-.feedback {
+.feedback-container {
     margin: 10px 0;
-}
-
-.feedback-list {
-    height: 50vh;
-    background: #a65353;
 }
 
 /* #endregion */
@@ -240,6 +268,14 @@ const loadFeedBack = () => {
 /* #region */
 .timeline {
     margin: 15px 10px;
+}
+
+.timeline-header {
+    display: flex;
+}
+
+.timeline-title {
+    margin: 5px 20px 5px 5px;
 }
 
 /* #endregion */

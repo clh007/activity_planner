@@ -13,13 +13,12 @@ import Header from "@/components/topbar.vue";
 </script>
 <style scoped>
 .web-layout {
-    width: 100%;
     overflow: hidden;
 }
 
 .web-bar {
     position: fixed;
-    width: 100vw;
+    width: 100%;
     height: 60px;
     z-index: 999;
     transition: all .3s ease-in-out;

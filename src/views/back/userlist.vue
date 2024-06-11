@@ -108,7 +108,7 @@
 <script setup lang="ts">
 import { addUser_API, getUserList_API, updatePassword_API, deleteUser_API } from '@/api/user'; // 从api文件夹导入接口
 import { reactive, ref, onMounted } from 'vue';
-import { FormInstance, FormRules } from 'element-plus';
+import { FormInstance, FormRules, ElMessageBox } from 'element-plus';
 
 const userAddDialogVisible = ref(false);
 const userAddForm = ref({
@@ -297,21 +297,34 @@ const updatePassword = async () => {
   }
 };
 
-// 删除用户
+// 删除资源
 const delUser = async (index: number, userlist: Array<any>) => {
   const user = userlist[index];
+  
   try {
-    // 调用删除用户的 API，传入用户的唯一标识，例如用户ID
-    console.log(user.id)
-    await deleteUser_API(user.id);
-    // 删除成功后，更新用户列表
-    userlist.splice(index, 1);
-    getUserList();
+    const confirm = await ElMessageBox.confirm(
+      `您确定要删除用户 "${user.name}" 吗？`,
+      '确认删除',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    );
+
+    if (confirm) {
+      await deleteUser_API(user.id);
+      userlist.splice(index, 1);
+      getUserList();
+    }
   } catch (error) {
-    console.error(error);
-    // 处理删除失败的情况，例如显示错误消息
+    // 捕获用户取消操作导致的异常
+    if (error !== 'cancel') {
+      console.error(error);
+    }
   }
 };
+
 
 </script>
 

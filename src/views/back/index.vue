@@ -9,8 +9,7 @@
             </el-icon>
             <span>资源管理</span>
           </template>
-          <el-menu-item @click="router.push({ name: 'userlist' })" index="1-1">活动模板</el-menu-item>
-          <el-menu-item @click="router.push({ name: 'resourcelist' })" index="1-2">所有资源</el-menu-item>
+          <el-menu-item @click="router.push({ name: 'resourcelist' })" index="1-1">所有资源</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="2">
           <template #title>

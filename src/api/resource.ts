@@ -65,3 +65,8 @@ export const submitResourceApply_API = (data: expense) => {
 export const getResourceApplyList = () => {
     return request.get('/resource/getApply')
 }
+
+  
+
+// 删除资源接口
+export const deleteResource_API = (userid: number) => {return request.post('/resource/delete/' + userid);};

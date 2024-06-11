@@ -1,6 +1,6 @@
 export interface addResourceFrom {
     name: string
-    type_id: number
+    newname: string
     total_num: number
     current_num: number
 }

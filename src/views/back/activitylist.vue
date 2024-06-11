@@ -1,41 +1,34 @@
 <template>
   <div class="activity-manage">
     <h1 class="page-title">活动管理</h1>
-    <div class="activity_search">
+    <div class="activity-search">
       <el-select v-model="searchType" placeholder="请选择搜索类型">
         <el-option label="活动名称" value="name"></el-option>
         <el-option label="创建者" value="creator_id"></el-option>
       </el-select>
       <el-input v-model="searchKeyword" placeholder="请输入搜索关键词"></el-input>
       <el-button type="primary" @click="searchActivity">搜索</el-button>
+      <el-button type="primary" @click="resetSearchActivityForm">重置</el-button>
     </div>
 
     <el-button type="primary" @click="showActivityAddDialog" style="margin: 15px 0;">+新增</el-button>
     <!-- 列表显示活动 -->
-    <el-table :data="activityList" border style="width: 100%" max-height="250">
-      <el-table-column prop="name" label="活动名称">
-      </el-table-column>
-      <el-table-column prop="creator_id" label="创建者">
-      </el-table-column>
-      <el-table-column prop="start_time" label="开始时间">
-      </el-table-column>
-      <el-table-column prop="end_time" label="结束时间">
-      </el-table-column>
-      <el-table-column prop="location" label="地点">
-      </el-table-column>
-      <el-table-column prop="state" label="状态">
-      </el-table-column>
-      <el-table-column prop="joiner_number" label="参与者人数">
-      </el-table-column>
-      <el-table-column prop="max_num" label="人数上限">
-      </el-table-column>
+    <el-table :data="activityList" border style="width: 100%" max-height="750">
+      <el-table-column prop="name" label="活动名称"></el-table-column>
+      <el-table-column prop="creator_id" label="创建者"></el-table-column>
+      <el-table-column prop="start_time" label="开始时间" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="end_time" label="结束时间" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="location" label="地点"></el-table-column>
+      <el-table-column prop="state" label="状态"></el-table-column>
+      <el-table-column prop="joiner_number" label="参与者人数"></el-table-column>
+      <el-table-column prop="max_num" label="人数上限"></el-table-column>
       <el-table-column label="操作" header-align="center">
-        <template slot-scope="scope">
+        <template v-slot:default="{ row, $index }">
           <div class="handler flex-center">
-            <el-button type="warning" @click.native.prevent.stop="openUpdateActivity(scope.$index, activityList)">
+            <el-button type="warning" @click.native.prevent.stop="openUpdateActivity($index, activityList)">
               修改
             </el-button>
-            <el-button @click.native.prevent="delActivity(scope.$index, activityList)" type="danger">
+            <el-button @click.native.prevent="delActivity($index, activityList)" type="danger">
               删除
             </el-button>
           </div>
@@ -77,10 +70,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="参与者人数" prop="joiner_number">
-          <el-input v-model="activityAddForm.joiner_number" autocomplete="off" placeholder="请输入参与者人数"></el-input>
+          <el-input v-model.number="activityAddForm.joiner_number" autocomplete="off" placeholder="请输入参与者人数"></el-input>
         </el-form-item>
         <el-form-item label="人数上限" prop="max_num">
-          <el-input v-model="activityAddForm.max_num" autocomplete="off" placeholder="请输入人数上限"></el-input>
+          <el-input v-model.number="activityAddForm.max_num" autocomplete="off" placeholder="请输入人数上限"></el-input>
         </el-form-item>
       </el-form>
 
@@ -96,9 +89,9 @@
 </template>
 
 <script setup lang="ts">
-import { addActivity_API, getActivityList_API, getActivityListByKeyword_API } from '@/api/activity'; // 从api文件夹导入接口
-import { reactive, ref } from 'vue';
-import { FormInstance, FormRules } from 'element-plus';
+import { addActivity_API, getActivityList_API, getActivityListByKeyword_API, deleteActivity_API } from '@/api/activity'; // 从api文件夹导入接口
+import { reactive, ref, onMounted } from 'vue';
+import { FormInstance, FormRules, ElMessageBox } from 'element-plus';
 
 const activityAddDialogVisible = ref(false);
 const activityAddForm = ref({
@@ -113,6 +106,14 @@ const activityAddForm = ref({
   max_num: 0
 });
 
+// 当组件挂载后执行一次getActivityList函数
+onMounted(async () => {
+  await getActivityList();
+});
+
+// 定义 activityList 为响应式数组
+const activityList = ref([]);
+
 const activityAddFormRef = ref<FormInstance>();
 
 const total = ref(0); // 总记录数
@@ -123,21 +124,11 @@ const searchType = ref(''); // 搜索类型
 const searchKeyword = ref(''); // 搜索关键词
 
 const rules = reactive<FormRules>({
-  name: [
-    { required: true, message: '请输入活动名称', trigger: 'blur' }
-  ],
-  creator_id: [
-    { required: true, message: '请输入创建者', trigger: 'blur' }
-  ],
-  start_time: [
-    { required: true, message: '请选择开始时间', trigger: 'blur' }
-  ],
-  end_time: [
-    { required: true, message: '请选择结束时间', trigger: 'blur' }
-  ],
-  state: [
-    { required: true, message: '请选择状态', trigger: 'blur' }
-  ],
+  name: [{ required: true, message: '请输入活动名称', trigger: 'blur' }],
+  creator_id: [{ required: true, message: '请输入创建者', trigger: 'blur' }],
+  start_time: [{ required: true, message: '请选择开始时间', trigger: 'blur' }],
+  end_time: [{ required: true, message: '请选择结束时间', trigger: 'blur' }],
+  state: [{ required: true, message: '请选择状态', trigger: 'blur' }],
   joiner_number: [
     { required: true, message: '请输入参与者人数', trigger: 'blur' },
     { type: 'number', message: '参与者人数必须为数字', trigger: 'blur' }
@@ -153,6 +144,10 @@ const resetActivityAddForm = () => {
     activityAddFormRef.value.resetFields();
   }
 };
+const resetSearchActivityForm = () => {
+  searchType.value = '';   // 将搜索类型重置为空字符串
+  searchKeyword.value = ''; // 将搜索关键词重置为空字符串
+};
 
 const showActivityAddDialog = () => {
   activityAddDialogVisible.value = true;
@@ -161,9 +156,9 @@ const showActivityAddDialog = () => {
 // 获取活动列表
 const getActivityList = async () => {
   try {
-    const response = await getActivityList_API(currentPage.value, pageSize.value); // 调用获取活动列表的接口
-    activityList.value = response.data; // 更新活动列表
-    total.value = response.total; // 更新总记录数
+    const response = await getActivityListByKeyword_API('', '', currentPage.value, pageSize.value); // 调用获取活动列表的接口
+    activityList.value = response.data.data.content; // 更新活动列表
+    total.value = response.data.data.totalElements; // 更新总记录数
   } catch (error) {
     console.error(error);
   }
@@ -179,6 +174,7 @@ const addActivity = async () => {
         getActivityList(); // 刷新活动列表
         resetActivityAddForm();
         activityAddDialogVisible.value = false;
+        console.log(response); // 根据返回信息处理结果,例如显示成功信息或处理错误
       }
     } catch (error) {
       console.error(error);
@@ -191,22 +187,61 @@ const searchActivity = async () => {
   if (searchType.value && searchKeyword.value) {
     try {
       const response = await getActivityListByKeyword_API(searchType.value, searchKeyword.value, currentPage.value, pageSize.value);
-      activityList.value = response.data; // 更新活动列表
+      activityList.value = response.data.data.content; // 更新活动列表
+      total.value = response.data.data.totalElements; // 更新总记录数
     } catch (error) {
       console.error(error);
     }
+  } else {
+    getActivityList(); // 如果搜索类型或关键词为空,则获取全部活动列表
   }
 };
 
 // 分页相关方法
 const handleCurrentChange = (page: number) => {
   currentPage.value = page;
-  getActivityList();
+  if (searchType.value && searchKeyword.value) {
+    searchActivity(); // 如果有搜索条件,则执行搜索
+  } else {
+    getActivityList(); // 否则获取全部活动列表
+  }
 };
 
 const handleSizeChange = (size: number) => {
   pageSize.value = size;
-  getActivityList();
+  if (searchType.value && searchKeyword.value) {
+    searchActivity(); // 如果有搜索条件,则执行搜索
+  } else {
+    getActivityList(); // 否则获取全部活动列表
+  }
+};
+
+// 删除活动
+const delActivity = async (index: number, activityList: Array<any>) => {
+  const activity = activityList[index];
+
+  try {
+    const confirm = await ElMessageBox.confirm(`您确定要删除活动 "${activity.name}" 吗 ?`,
+      '确认删除',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    );
+
+
+    if (confirm) {
+      await deleteActivity_API(activity.id);
+      activityList.splice(index, 1);
+      getActivityList();
+    }
+  } catch (error) {
+    // 捕获用户取消操作导致的异常
+    if (error !== 'cancel') {
+      console.error(error);
+    }
+  }
 };
 </script>
 
@@ -216,6 +251,7 @@ const handleSizeChange = (size: number) => {
 }
 
 .page-title {
+  text-align: center;
   text-align: center;
   font-size: 30px;
   color: #333;

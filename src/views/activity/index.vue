@@ -32,15 +32,13 @@
         <div class="content">
             <div class="intro">
                 <span>简介</span>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae libero eligendi odio eos
-                    molestias optio qui nam. Quas, pariatur, nostrum et enim voluptatem molestiae dolore tempora,
-                    tenetur praesentium alias doloribus.</p>
+                <p>{{ activity.info }}</p>
             </div>
-        </div>
-        <div class="activity-bar">
-            <el-button @click="timeline_drawer = true">查看时间轴</el-button>
-            <el-button @click="chatroom_drawer = true">进入聊天室</el-button>
-            <el-button @click="joiner_drawer = true">成员列表</el-button>
+            <div class="activity-bar">
+                <el-button @click="timeline_drawer = true">查看时间轴</el-button>
+                <el-button @click="chatroom_drawer = true">进入聊天室</el-button>
+                <el-button @click="joiner_drawer = true">成员列表</el-button>
+            </div>
         </div>
         <div class="feedback-container">
             <feedback v-model:act_id="act_id" />
@@ -55,7 +53,7 @@
                         <el-button type="info" @click="addSchedule_drawer = true" v-if="isCreator">添加日程</el-button>
                     </div>
                 </template>
-                <timeline v-model:act_id="act_id" />
+                <timeline v-model:act_id="act_id" v-model:timeline_drawer="timeline_drawer" />
             </el-drawer>
         </div>
         <div class="chat-container">
@@ -65,7 +63,7 @@
         </div>
         <div class="join-container">
             <el-drawer v-model="joiner_drawer" :with-header="false" title="聊天室" size="40%">
-                <joinerList v-model:act_id="act_id" />
+                <joinerList v-model:act_id="act_id" v-model:isCreator="isCreator" />
             </el-drawer>
         </div>
         <el-drawer size="40%" v-model="addSchedule_drawer" title="添加一个日程" direction="ltr">
@@ -115,7 +113,7 @@ const getActivity = () => {
             activity.value = {
                 id: 0,
                 name: 'planner',
-                info: '你在干嘛哎呦',
+                info: '你在干嘛哎呦1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111',
                 location: '教室1',
                 start_time: '2022-05-01 00:00:00',
                 end_time: '2022-05-01 00:00:00',
@@ -209,13 +207,18 @@ const shareAct = () => {
 
 .intro {
     margin-top: 12px;
+    margin-bottom: 20px;
     display: flex;
+    flex-direction: column;
 }
 
 .intro p {
-    height: 10vh;
-    overflow-y: auto;
+    max-height: 10vh;
+    overflow: auto;
+    word-wrap: break-word;
     flex: 1;
+    margin-left: 30px;
+    background: #b2e2ed;
 }
 
 .intro p::-webkit-scrollbar {
@@ -260,10 +263,10 @@ const shareAct = () => {
 /* #region content*/
 .content {
     width: 100%;
-    /* height: 100vh; */
-    background: #9dadc8;
     display: flex;
+    flex-direction: column;
 }
+
 
 .chat-container {
     /* width: 30vw; */

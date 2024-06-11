@@ -41,7 +41,7 @@ import { joinerList_API, updateIdentify_API } from '@/api/joiner';
 import { computed, onMounted, ref } from 'vue';
 
 const acd_id = defineModel('act_id', { default: 0 })
-
+const isCreator = defineModel('isCreator', { default: false })
 const count = ref(0)
 onMounted(() => {
     joinerList_API(acd_id.value)
@@ -83,10 +83,12 @@ const id_form = ref({
 })
 
 const openDia = (id: number, role: string) => {
+    if (isCreator.value) {
+        dialogVisible.value = true
+        id_form.value.id = id
+        id_form.value.identity = role
+    }
 
-    dialogVisible.value = true
-    id_form.value.id = id
-    id_form.value.identity = role
 }
 const submitIden = () => {
     updateIdentify_API(id_form.value)

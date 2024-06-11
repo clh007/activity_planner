@@ -28,3 +28,8 @@ export const updateTemplate_API = (data: updateTemplateForm) => {
 
 // 删除活动模板接口
 export const deleteTemplate_API = (template_id: number) => { return request.post('/template/delete/' + template_id); };
+
+// 请求所有模板
+export const fetchAllTemplates_API = () => {
+  return request.get('/activity/templates');
+};

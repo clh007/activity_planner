@@ -127,7 +127,7 @@ const searchActivity = () => {
                     location: '服务器崩溃了',
                     info: "服务器崩溃了",
                     max_num: 1,
-                    join_num: 1,
+                    joiner_number: 1,
                 }, {
                     id: 1,
                     name: '服务器崩溃了',
@@ -137,7 +137,7 @@ const searchActivity = () => {
                     location: '服务器崩溃了',
                     info: "服务器崩溃了",
                     max_num: 1,
-                    join_num: 1,
+                    joiner_number: 1,
                 },
             ]
         })
@@ -150,7 +150,7 @@ const activity_form = ref<Activity>({
     end_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
     location: "string",
     state: "string",
-    join_num: 1,
+    joiner_number: 1,
     max_num: 1,
 })
 
@@ -175,7 +175,7 @@ const fetchAllActivities = () => {
                     location: '服务器崩溃了',
                     info: "服务器崩溃了",
                     max_num: 1,
-                    join_num: 1,
+                    joiner_number: 1,
                 })
             }
         })

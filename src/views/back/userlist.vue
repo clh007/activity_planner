@@ -61,14 +61,14 @@
         </el-form-item>
         <el-form-item label="性别" prop="gender">
           <el-radio-group v-model="userAddForm.gender" class="ml-4">
-            <el-radio label=0>男</el-radio>
-            <el-radio label=1>女</el-radio>
+            <el-radio label=0 :value="0">男</el-radio>
+            <el-radio label=1 :value="1">女</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="管理员" prop="is_admin">
           <el-radio-group v-model="userAddForm.is_admin" class="ml-4">
-            <el-radio label=0>是</el-radio>
-            <el-radio label=1>否</el-radio>
+            <el-radio label=0 :value="1">是</el-radio>
+            <el-radio label=1 :value="0">否</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -118,7 +118,7 @@ const userAddForm = ref({
   phone: '',
   email: '',
   gender: 0,
-  is_admin: 0,
+  is_admin: 1,
 });
 
 
@@ -169,32 +169,32 @@ const validateConfirmPassword = (rule: any, value: string, callback: any) => {
 };
 
 const rules = reactive<FormRules>({
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '用户名长度应在 3 到 20 个字符', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/, message: '密码应为8-16位,包含大小写字母、数字和特殊符号', trigger: 'blur' }
-  ],
-  userpwdagain: [
-    { required: true, message: '请确认密码', trigger: 'blur' },
-    { validator: validateConfirmPassword, trigger: 'blur' }
-  ],
-  phone: [
-    { required: true, message: '请输入手机号码', trigger: 'blur' },
-    { pattern: /^1[3456789]\d{9}$/, message: '手机号码格式不正确', trigger: 'blur' }
-  ],
-  email: [
-    { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-    { pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/, message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
-  ],
-  gender: [
-    { required: true, message: '请选择性别', trigger: 'change' }
-  ],
-  is_admin: [
-    { required: true, message: '请选择是否是管理员', trigger: 'change' }
-  ]
+  // username: [
+  //   { required: true, message: '请输入用户名', trigger: 'blur' },
+  //   { min: 3, max: 20, message: '用户名长度应在 3 到 20 个字符', trigger: 'blur' }
+  // ],
+  // password: [
+  //   { required: true, message: '请输入密码', trigger: 'blur' },
+  //   { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/, message: '密码应为8-16位,包含大小写字母、数字和特殊符号', trigger: 'blur' }
+  // ],
+  // userpwdagain: [
+  //   { required: true, message: '请确认密码', trigger: 'blur' },
+  //   { validator: validateConfirmPassword, trigger: 'blur' }
+  // ],
+  // phone: [
+  //   { required: true, message: '请输入手机号码', trigger: 'blur' },
+  //   { pattern: /^1[3456789]\d{9}$/, message: '手机号码格式不正确', trigger: 'blur' }
+  // ],
+  // email: [
+  //   { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+  //   { pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/, message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
+  // ],
+  // gender: [
+  //   { required: true, message: '请选择性别', trigger: 'change' }
+  // ],
+  // is_admin: [
+  //   { required: true, message: '请选择是否是管理员', trigger: 'change' }
+  // ]
 });
 
 // 修改密码的表单验证规则
@@ -300,7 +300,7 @@ const updatePassword = async () => {
 // 删除资源
 const delUser = async (index: number, userlist: Array<any>) => {
   const user = userlist[index];
-  
+
   try {
     const confirm = await ElMessageBox.confirm(
       `您确定要删除用户 "${user.name}" 吗？`,

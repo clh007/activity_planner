@@ -83,3 +83,9 @@ export const addSchedule_API = (schedule: Schedule) => {
 export const takePartActive_API = (id: number) => {
     return request.get(`/activity/takePart?activity_id=${id}`)
 }
+
+export const createActivity_API = (act: Activity) => {
+    return request.post(`/activity/creating`, JSON.stringify(act), {
+        headers: { 'Content-Type': 'application/json' }
+    })
+}

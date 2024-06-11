@@ -1,4 +1,4 @@
-import { useUserTokenStore } from "@/store/token";
+import { useUserStore } from "@/store/user";
 import axios from "axios";
 import { ElMessage } from "element-plus";
 
@@ -17,7 +17,7 @@ instance.interceptors.request.use(config => {
     // 打印请求配置到控制台，用于调试目的。
     console.log(config)
     // 尝试从用户令牌存储中获取当前用户的令牌。
-    const token = useUserTokenStore().getUserToken()
+    const token = useUserStore().currentUser.userToken
     // 如果令牌获取成功，将其添加到请求头中。
     config.headers.set('userToken', `${token}`)
     // 返回修改后的请求配置对象。

@@ -18,7 +18,7 @@
                 </div>
                 <div class="joiner_number">
                     <span>参与人数</span>
-                    <p>{{ activity.join_num }}</p>
+                    <p>{{ activity.joiner_number }}</p>
                 </div>
                 <div class="activity-status">
                     <span>活动状态</span>
@@ -118,7 +118,7 @@ const getActivity = () => {
                 start_time: '2022-05-01 00:00:00',
                 end_time: '2022-05-01 00:00:00',
                 username: '李晓坤',
-                join_num: 666,
+                joiner_number: 666,
                 state: '进行中',
                 creator_id: currentUser.value.id
             }

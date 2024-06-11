@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import { Search } from '@element-plus/icons-vue'
 import { ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';
+import { useUserStore } from '@/store/user';
 const router = useRouter()
 const webInfoStore = useWebInfoStore()
 const { is_login, topbar } = storeToRefs(webInfoStore)
@@ -45,6 +46,8 @@ const searchEnter = (p: KeyboardEvent) => {
     navToSearch()
   }
 }
+
+const { currentUser } = storeToRefs(useUserStore())
 </script>
 
 <template>
@@ -79,7 +82,7 @@ const searchEnter = (p: KeyboardEvent) => {
         })">
           活动详情页
         </li>
-        <li class="adminEnter" @click="router.push('/back')">
+        <li class="adminEnter" @click="router.push('/back')" v-if="currentUser.is_admin">
           后台
         </li>
         <li class="create" @click="router.push('/create')">

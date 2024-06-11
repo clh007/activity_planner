@@ -36,8 +36,12 @@
 </template>
 
 <script setup lang="ts">
+import { createActivity_API } from '@/api/activity';
+import { fetchAllTemplates_API } from '@/api/template';
 import type { Activity_template, Activity } from '@/models/avtivity';
+import { useUserStore } from '@/store/user';
 import { ElMessage } from 'element-plus';
+import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue'
 const temp_select = ref('自定义')
 
@@ -70,44 +74,28 @@ const activity = ref<Activity>({
 })
 const start_end = ref<[string, string]>(['', ''])
 
-const options = ref<Activity_template[]>([
-    {
-        id: 0,
-        tem_name: '自定义',
-        info: '',
-        name: '',
-        location: '',
-    },
-    {
-        id: 1,
-        tem_name: '会议',
-        name: '我的会议',
-        info: '我的会议很好',
-        location: '线上',
-    },
-    {
-        id: 2,
-        tem_name: '展览',
-        name: '我的展览',
-        info: '我的展览很好',
-        location: '线下',
-    },
-]);
+const options = ref<Activity_template[]>([{
+    id: 0,
+    tem_name: '自定义',
+    name: '',
+    info: '',
+    location: '',
+}]);
 
 // 请求数据的逻辑
 const fetchActivityTemplates = () => {
-    // fetchActivityTemplates_API()
-    //     .then(res => {
-    //         console.log(res.data.data)
-
-    //     }).catch(error => {
-    //         console.error('请求模板数据失败:', error);
-    //     });
+    fetchAllTemplates_API()
+        .then(res => {
+            console.log(res.data.data)
+            options.value.push(...res.data.data)
+        }).catch(error => {
+            console.error('请求模板数据失败:', error);
+        });
 };
 onMounted(() => {
     fetchActivityTemplates()
 })
-
+const { currentUser } = storeToRefs(useUserStore())
 const createActivity = () => {
     if (activity.value.name == '') {
         ElMessage.error('请输入活动标题')
@@ -119,8 +107,19 @@ const createActivity = () => {
     }
     activity.value.start_time = start_end.value![0].toString()
     activity.value.end_time = start_end.value![1].toString()
+    activity.value.creator_id = currentUser.value.id
+    createActivity_API(activity.value)
+        .then(res => {
+            if (res.data.code === 200) {
+                ElMessage.success('创建成功')
+            }
+            else {
+                ElMessage.error('创建失败')
+            }
+        })
+        .catch(err => {
 
-    ElMessage.success('创建活动成功')
+        })
 }
 
 </script>

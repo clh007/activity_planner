@@ -59,12 +59,10 @@ import type { RegisterForm } from "@/models/auth";
 import { ElMessage } from 'element-plus';
 import { ref } from 'vue'
 import { useWebInfoStore } from '@/store/webInfo';
-import { useUserTokenStore } from '@/store/token';
 import { useRouter } from 'vue-router';
 
 const router = useRouter()
 const webInfoStore = useWebInfoStore()
-const userTokenStore = useUserTokenStore()
 
 // 组件数据
 const is_switch = ref(true)
@@ -104,21 +102,21 @@ const login = () => {
   }
   login_API(data)
     .then(res => {
-      // console.log(res.data)
       if (res.data.code === 400) {
         ElMessage.error(res.data.message)
       }
       if (res.data.code === 200) {
+        // console.log(res.data.data)
         ElMessage.success({
           message: "登录成功"
         })
-        userTokenStore.setUserToken(res.data.data)
+        useUserStore().setUser(res.data.data)
+        // console.log(useUserStore().currentUser)
         webInfoStore.login()
         router.push('/')
       }
     })
     .catch(err => {
-
     })
 }
 
@@ -151,13 +149,19 @@ const register = async () => {
   }
   await register_API(data)
     .then(res => {
-      ElMessage.success("注册成功")
+      if (res.data.code === 200) {
+        ElMessage.success("注册成功")
+      } else if (res.data.code === 400) {
+        ElMessage.error(res.data.message)
+      }
+
     })
     .catch(err => {
       ElMessage.error("注册失败")
     })
 }
 import { phoneNumberStyle, emailValidator } from '@/utils/common';
+import { useUserStore } from '@/store/user';
 /**
  * 获取验证码的函数
  * 根据输入账号的类型（手机或邮箱）验证账号格式，并发送验证码
@@ -183,10 +187,10 @@ const getcode = () => {
     } else {
       getVerificationCode_API(account.value, "phone")
         .then(res => {
-          // console.log(res.data)
+          console.log(res.data)
         })
         .catch(err => {
-          // console.log(err)
+          console.log(err)
         })
       ElMessage.success("获取成功!")
     }
@@ -198,7 +202,7 @@ const getcode = () => {
     } else {
       getVerificationCode_API(account.value, "email")
         .then(res => {
-          // console.log(res.data)
+          console.log(res.data)
         })
         .catch(err => {
           // console.log(err)

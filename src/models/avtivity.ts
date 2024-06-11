@@ -10,7 +10,7 @@ export interface Activity {
     end_time?: string,
     location?: string,
     state?: string,
-    join_num?: number,
+    joiner_number?: number,
     max_num?: number,
 }
 

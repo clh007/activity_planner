@@ -7,9 +7,11 @@ export interface currentUser {
     avatar: string;
     create_time: string;
     update_time: string;
+    is_admin: boolean;
+    userToken: string
 }
 
-export interface UpdatePasswordForm{
+export interface UpdatePasswordForm {
     userid: number;
     new_password: string;
     confirmPassword: string;

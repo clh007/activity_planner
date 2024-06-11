@@ -13,9 +13,10 @@ export const useUserStore = defineStore("userStore", () => {
         avatar: "",
         gender: "",
         create_time: "",
-        update_time: ""
+        update_time: "",
+        is_admin: true,
+        userToken: ""
     })
-
     const setUser = (user: any) => {
         currentUser.value = user
     }
@@ -28,7 +29,9 @@ export const useUserStore = defineStore("userStore", () => {
             avatar: "",
             gender: "",
             create_time: "",
-            update_time: ""
+            update_time: "",
+            is_admin: true,
+            userToken: ""
         }
     }
     return { currentUser, setUser, clearUser }

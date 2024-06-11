@@ -26,7 +26,7 @@
                 </div>
                 <el-button class="take-part" type="primary" @click="takePartAct()">参与活动</el-button>
             </div>
-            <el-button class="share" circle type="warning" :icon="Share">
+            <el-button class="share" circle type="warning" :icon="Share" @click="shareAct()">
             </el-button>
         </div>
         <div class="content">
@@ -142,6 +142,17 @@ const takePartAct = () => {
         })
         .catch((err) => {
             ElMessage.error('参与失败')
+        })
+}
+
+const shareAct = () => {
+    let currentUrl = window.location.href
+    navigator.clipboard.writeText(currentUrl)
+        .then(() => {
+            ElMessage.success('已复制到剪贴板')
+        })
+        .catch((err) => {
+            ElMessage.error('分享失败')
         })
 }
 </script>

@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from "vue-router";
 import { Search } from '@element-plus/icons-vue'
 import { ref, watch } from 'vue';
+import { ElMessage } from 'element-plus';
 const router = useRouter()
 const webInfoStore = useWebInfoStore()
 const { is_login, topbar } = storeToRefs(webInfoStore)
@@ -26,6 +27,10 @@ watch(scrollTop, (newscrollTop, oldscrollTop) => {
 })
 
 const navToSearch = () => {
+  if (search_key.value === '') {
+    ElMessage.warning('请输入搜索关键字')
+    return
+  }
   router.push({
     name: 'search',
     params: {
@@ -33,6 +38,12 @@ const navToSearch = () => {
     }
   })
   search_key.value = ''
+}
+
+const searchEnter = (p: KeyboardEvent) => {
+  if (p.code === 'Enter') {
+    navToSearch()
+  }
 }
 </script>
 
@@ -58,7 +69,7 @@ const navToSearch = () => {
           <span>个人界面</span>
         </li>
         <li class="search-bar myCenter">
-          <el-input v-model="search_key" placeholder="搜索活动" class="search-input" />
+          <el-input v-model="search_key" placeholder="搜索活动" class="search-input" @keydown="searchEnter" />
           <el-icon size="25px" @click="navToSearch()" class="search-icon">
             <Search />
           </el-icon>

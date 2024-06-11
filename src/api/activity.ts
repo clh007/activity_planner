@@ -34,11 +34,9 @@ export const updateActivity_API = (activity: Activity) => {
     return request.post('/activity/update', JSON.stringify(activity))
 }
 
-//删除活动
-export const deleteActivity_API = (id: number) => {
-    const queryParams = `?id=${id}`
-    return request.delete('/activity/delete' + queryParams)
-}
+
+// 删除活动模板接口
+export const deleteActivity_API = (activityid: number) => { return request.post('/activity/delete/' + activityid); };
 
 export const getActivity_API = (id: number) => {
     return request.get(`/activity/get?id=${id}`)
@@ -60,7 +58,7 @@ export const getActivityListPage_API = (curPage: number, pageSize: number) => {
 
 //关键字查询活动
 export const getActivityListByKeyword_API = (type: string, keyword: string, page: number, size: number) => {
-    return request.post('/resource/search', {
+    return request.post('/activity/search', {
         type: type,
         keyword: keyword,
         page: page,

@@ -93,7 +93,13 @@ import { addTemplate_API, getTemplateList_API, updateTemplate_API, deleteTemplat
 import { reactive, ref, onMounted } from 'vue';
 import { type FormInstance, type FormRules, ElMessageBox } from 'element-plus';
 
-const templateList = ref([]);
+const templateList = ref([{
+  id: 0,
+  tem_name: '',
+  name: '',
+  info: '',
+  location: '',
+}]);
 const templateAddDialogVisible = ref(false);
 const templateUpdateDialogVisible = ref(false);
 

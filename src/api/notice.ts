@@ -1,4 +1,4 @@
-import type { Notice, noticeTemplateAddForm } from "@/models/notice";
+import type { Notice, noticeTemplateAddForm, noticeTemplateForm } from "@/models/notice";
 import request from "@/utils/request"
 
 
@@ -40,7 +40,7 @@ export const addNoticeTemplate_API = (data: noticeTemplateAddForm) => {
 
 
 // 修改通知模板接口
-export const updateNoticeTemplate_API = (data: Notice) => {
+export const updateNoticeTemplate_API = (data: noticeTemplateForm) => {
     return request.post('/notice/tamplateupdate', JSON.stringify(data), {
         headers: { 'Content-Type': 'application/json' }
     });

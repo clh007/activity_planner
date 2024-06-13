@@ -55,7 +55,7 @@ export default defineConfig({
     // }
   },
   base: '/activity_planner/',
-  // base: "./",
+  // base: "/",
   build: {
     outDir: 'docs',
   }

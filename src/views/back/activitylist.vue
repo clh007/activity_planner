@@ -25,9 +25,6 @@
       <el-table-column label="操作" header-align="center">
         <template v-slot:default="{ row, $index }">
           <div class="handler flex-center">
-            <el-button type="warning" @click.native.prevent.stop="openUpdateActivity($index, activityList)">
-              修改
-            </el-button>
             <el-button @click.native.prevent="delActivity($index, activityList)" type="danger">
               删除
             </el-button>

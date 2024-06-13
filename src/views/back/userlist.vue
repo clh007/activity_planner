@@ -169,32 +169,32 @@ const validateConfirmPassword = (rule: any, value: string, callback: any) => {
 };
 
 const rules = reactive<FormRules>({
-  // username: [
-  //   { required: true, message: '请输入用户名', trigger: 'blur' },
-  //   { min: 3, max: 20, message: '用户名长度应在 3 到 20 个字符', trigger: 'blur' }
-  // ],
-  // password: [
-  //   { required: true, message: '请输入密码', trigger: 'blur' },
-  //   { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/, message: '密码应为8-16位,包含大小写字母、数字和特殊符号', trigger: 'blur' }
-  // ],
-  // userpwdagain: [
-  //   { required: true, message: '请确认密码', trigger: 'blur' },
-  //   { validator: validateConfirmPassword, trigger: 'blur' }
-  // ],
-  // phone: [
-  //   { required: true, message: '请输入手机号码', trigger: 'blur' },
-  //   { pattern: /^1[3456789]\d{9}$/, message: '手机号码格式不正确', trigger: 'blur' }
-  // ],
-  // email: [
-  //   { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-  //   { pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/, message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
-  // ],
-  // gender: [
-  //   { required: true, message: '请选择性别', trigger: 'change' }
-  // ],
-  // is_admin: [
-  //   { required: true, message: '请选择是否是管理员', trigger: 'change' }
-  // ]
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 3, max: 20, message: '用户名长度应在 3 到 20 个字符', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/, message: '密码应为8-16位,包含大小写字母、数字和特殊符号', trigger: 'blur' }
+  ],
+  userpwdagain: [
+    { required: true, message: '请确认密码', trigger: 'blur' },
+    { validator: validateConfirmPassword, trigger: 'blur' }
+  ],
+  phone: [
+    { required: true, message: '请输入手机号码', trigger: 'blur' },
+    { pattern: /^1[3456789]\d{9}$/, message: '手机号码格式不正确', trigger: 'blur' }
+  ],
+  email: [
+    { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+    { pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/, message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
+  ],
+  gender: [
+    { required: true, message: '请选择性别', trigger: 'change' }
+  ],
+  is_admin: [
+    { required: true, message: '请选择是否是管理员', trigger: 'change' }
+  ]
 });
 
 // 修改密码的表单验证规则
@@ -207,7 +207,7 @@ const passwordRules = {
     { required: true, message: '请再次输入新密码', trigger: 'blur' },
     { min: 6, message: '密码长度不能少于6位', trigger: 'blur' },
     {
-      validator: (rule, value, callback) => {
+      validator: (rule: any, value: any, callback: any) => {
         if (value !== passwordForm.new_password) {
           callback(new Error('两次输入的密码不一致'));
         } else {

@@ -3,7 +3,6 @@ export interface Activity {
     name: string,
     creator?: string,
     creator_id?: number,
-    username?: string,
     info: string,
     picture?: string
     start_time?: string,
@@ -11,6 +10,7 @@ export interface Activity {
     location?: string,
     state?: string,
     joiner_number?: number,
+    is_join?: boolean,
     max_num?: number,
 }
 

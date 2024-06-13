@@ -14,7 +14,7 @@
                     </el-table-column>
                     <el-table-column prop="activity_name" label="参与活动" width="150">
                     </el-table-column>
-                    <el-table-column prop="account" label="申请金额" width="200">
+                    <el-table-column prop="amount" label="申请金额" width="200">
                     </el-table-column>
                     <el-table-column prop="reason" label="申请理由" min-width="200">
                     </el-table-column>
@@ -26,11 +26,11 @@
                     <el-table-column fixed="right" label="操作" header-align="center" min-width="200">
                         <template #default="scope">
                             <div class="handler  myCenter">
-                                <el-button :disabled="expenseList[scope.row.state].state !== 0" type="warning"
+                                <el-button :disabled="scope.row.state !== 0" type="warning"
                                     @click.native.prevent.stop="agreeExpense(scope.$index)">
                                     同意
                                 </el-button>
-                                <el-button :disabled="expenseList[scope.row.state].state !== 0"
+                                <el-button :disabled="scope.row.state !== 0"
                                     @click.native.prevent="disAgreeExpense(scope.$index)" type="danger">
                                     拒绝
                                 </el-button>
@@ -43,12 +43,14 @@
                     </el-table-column>
                     <el-table-column prop="activity_name" label="参与活动" width="150">
                     </el-table-column>
-                    <el-table-column prop="account" label="申请金额" width="200">
+                    <el-table-column prop="amount" label="申请金额" width="200">
                     </el-table-column>
                     <el-table-column prop="reason" label="申请理由" min-width="200">
                     </el-table-column>
                     <el-table-column label="申请状态" min-width="200">
-                        <template #default="scope">{{ scope.row.state ? '已通过' : '待审核' }}</template>
+                        <template #default="scope">{{ scope.row.state === 0 ? '待审核' : scope.row.state === 1 ? '已通过'
+                            : '已拒绝'
+                            }}</template>
                     </el-table-column>
                 </el-table>
             </div>
@@ -59,7 +61,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';
-
 import type { expense } from '@/models/charges';
 import { fetchAllExpense_API, updateExpenseState_API } from '@/api/charges';
 
@@ -88,6 +89,7 @@ const fetchAllExpense = () => {
         .then(res => {
             if (res.data.code === 200) {
                 expenseList.value = res.data.data
+                console.log(expenseList.value)
             } else {
                 ElMessage.error("请求失败")
             }
@@ -98,7 +100,7 @@ const fetchAllExpense = () => {
                     id: i,
                     username: '服务器崩溃了' + i,
                     activity_name: '服务器崩溃了' + i,
-                    account: i,
+                    amount: i,
                     reason: "服务器崩溃了",
                     state: i % 3
                 })
@@ -108,11 +110,14 @@ const fetchAllExpense = () => {
 const expenseList = ref<expense[]>([])
 
 const agreeExpense = (index: number) => {
-    expenseList.value[index].state = 1
     updateExpenseState_API(1, expenseList.value[index].id)
         .then(res => {
             if (res.data.code === 200) {
-                ElMessage.success("同意成功")
+                ElMessage.success("审核成功")
+                fetchAllExpense()
+            }
+            else {
+                ElMessage.error(res.data.message)
             }
         })
         .catch(err => {
@@ -121,9 +126,20 @@ const agreeExpense = (index: number) => {
 }
 
 const disAgreeExpense = (index: number) => {
-    expenseList.value[index].state = 0
-    ElMessage.success("拒绝成功")
+    updateExpenseState_API(2, expenseList.value[index].id)
+        .then(res => {
+            if (res.data.code === 200) {
+                ElMessage.success("审核成功")
+                fetchAllExpense()
+            }
+            else {
+                ElMessage.error(res.data.message)
+            }
+        })
+        .catch(err => {
+        })
 }
+
 </script>
 
 <style scoped>

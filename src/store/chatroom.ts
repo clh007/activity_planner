@@ -5,6 +5,7 @@ import { ref } from "vue";
 export const useMyWebSocketTokenStore = defineStore("myWebSocketStore", () => {
     let client: WebSocket
     const initWebSocket = (url: string) => {
+        console.info(url)
         try {
             client = new WebSocket(url)
         }
@@ -26,8 +27,8 @@ export const useMyWebSocketTokenStore = defineStore("myWebSocketStore", () => {
         return client
     }
 
-    const closeWebSocket = (client: WebSocket) => {
-        if (!client.CLOSED || !client.CLOSING)
+    const closeWebSocket = (client: WebSocket | null) => {
+        if (client !== null)
             client.close()
     }
     const sendMsg = (msg: string) => {

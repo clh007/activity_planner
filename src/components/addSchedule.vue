@@ -65,6 +65,5 @@ const addSchedule = () => {
         end_time: '',
     }
     drawer.value = false
-    ElMessage.success("添加成功")
 }
 </script>

@@ -12,34 +12,26 @@ export const fetchActivityTemplates_API = (params?: any) => {
 };
 
 
-// 当前用户创建的活动
-export const fetchAllActivitiesPub_API = () => {
-    return request.get(`/activity/pubByUser`);
-};
-// 当前用户参与的活动
-export const fetchAllActivitiesPar_API = () => {
-    return request.get(`/activity/parByUser`);
+// 用户页请求活动
+export const fetchUserActivity_API = (user_id: number, type: 'par' | 'pub', search_key: string | null) => {
+    const queryParams = search_key !== null ? `?id=${user_id}&type=${type}&search_key=${search_key}` : `?id=${user_id}&type=${type}`;
+    return request.get(`/activity/userDetail` + queryParams);
 };
 
-export const fetchActivitiesByKeyPub_API = (key: string) => {
-    const queryParams = `?search_key=${key}`
-    return request.get('/activity/userSearchPub' + queryParams)
-}
-export const fetchActivitiesByKeyPar_API = (key: string) => {
-    const queryParams = `?search_key=${key}`
-    return request.get('/activity/userSearchPar' + queryParams)
-}
+
 // 更新当前用户创建的活动
 export const updateActivity_API = (activity: Activity) => {
-    return request.post('/activity/update', JSON.stringify(activity))
+    return request.put('/activity/update', JSON.stringify(activity), {
+        headers: { 'Content-Type': 'application/json' }
+    })
 }
 
 
-// 删除活动模板接口
+// 删除活动接口
 export const deleteActivity_API = (activityid: number) => { return request.post('/activity/delete/' + activityid); };
 
 export const getActivity_API = (id: number) => {
-    return request.get(`/activity/get?id=${id}`)
+    return request.get(`/activity/findactivitybyid?activityid=${id}`)
 }
 
 //后台添加活动
@@ -71,21 +63,38 @@ export const getActivityListByKeyword_API = (type: string, keyword: string, page
 
 // 获取活动日程列表
 export const getScheduleList_API = (id: number) => {
-    return request.get(`/activity/schedule/list?activity_id=${id}`)
+    return request.get(`/activity/findschdulebyid?activityid=${id}`)
 }
 
 // 添加活动日程
 export const addSchedule_API = (schedule: Schedule) => {
-    return request.post('/activity/schedule/add', JSON.stringify(schedule))
+    return request.post('/activity/schcreating', JSON.stringify(schedule), {
+        headers: { 'Content-Type': 'application/json' }
+    })
 }
 
 // 参加活动
 export const takePartActive_API = (id: number) => {
-    return request.get(`/activity/takePart?activity_id=${id}`)
+    return request.post(`/activity/join`, JSON.stringify({
+        activity_id: id
+    }), {
+        headers: { 'Content-Type': 'application/json' }
+    })
 }
 
 export const createActivity_API = (act: Activity) => {
     return request.post(`/activity/creating`, JSON.stringify(act), {
+        headers: { 'Content-Type': 'application/json' }
+    })
+}
+
+// 创建日程提醒
+export const createSchRemind_API = (sch: {
+    user_id: number,
+    method: string,
+    time: string,
+}) => {
+    return request.post(`/schuleremind/create`, JSON.stringify(sch), {
         headers: { 'Content-Type': 'application/json' }
     })
 }

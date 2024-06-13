@@ -10,14 +10,21 @@ const router = useRouter()
 const webInfoStore = useWebInfoStore()
 const { is_login, topbar } = storeToRefs(webInfoStore)
 const search_key = ref('')
+
 const logout = () => {
   webInfoStore.logout()
+  useUserStore().clearUser()
+  localStorage.removeItem("userToken")
+  localStorage.removeItem("currentUser")
   router.push('/login')
 }
+
 const scrollTop = ref(0)
+
 window.onscroll = () => {
   scrollTop.value = document.documentElement.scrollTop
 }
+
 watch(scrollTop, (newscrollTop, oldscrollTop) => {
   let enter = newscrollTop > window.innerHeight / 2
   let up = newscrollTop - oldscrollTop < 0
@@ -97,7 +104,7 @@ const { currentUser } = storeToRefs(useUserStore())
                   <span>登录</span>
                 </el-dropdown-item>
                 <el-dropdown-menu v-else>
-                  <el-dropdown-item>个人中心</el-dropdown-item>
+                  <el-dropdown-item @click="router.push('/user')">个人中心</el-dropdown-item>
                   <el-dropdown-item @click="logout()"> 退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown-menu>

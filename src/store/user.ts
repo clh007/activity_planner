@@ -3,10 +3,9 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 
 
-
 export const useUserStore = defineStore("userStore", () => {
     const currentUser = ref<currentUser>({
-        id: 0,
+        id: -1,
         username: "",
         email: "",
         phone: "",
@@ -22,7 +21,7 @@ export const useUserStore = defineStore("userStore", () => {
     }
     const clearUser = () => {
         currentUser.value = {
-            id: 0,
+            id: -1,
             username: "",
             email: "",
             phone: "",

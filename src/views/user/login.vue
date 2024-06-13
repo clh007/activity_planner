@@ -113,7 +113,9 @@ const login = () => {
         useUserStore().setUser(res.data.data)
         // console.log(useUserStore().currentUser)
         webInfoStore.login()
-        router.push('/')
+        localStorage.setItem("userToken", res.data.data.userToken)
+        localStorage.setItem("currentUser", JSON.stringify(res.data.data))
+        router.push({ name: "home" })
       }
     })
     .catch(err => {

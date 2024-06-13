@@ -4,22 +4,22 @@
             <div class="creator">创建者</div>
             <li v-for="item in creatorList" :key="item.id" class="infinite-list-item">
                 <div class="avatar">
-                    <el-avatar src="https://www.bilibili.com/favicon.ico?v=1" />
+                    <el-avatar :src="item.avatar" />
                 </div>
                 <div class="user-name">
-                    <span>{{ item.name }}</span>
+                    <span>{{ item.username }}</span>
                 </div>
                 <span @click="openDia(item.id, item.identity)" class="identify">{{ item.identity }}</span>
             </li>
             <div class="joiner-list">参与者列表</div>
             <li v-for="item in joinerList.filter(item => {
-                return item.quanxain === '参与者'
+                return item.quanxian === '参与者'
             })" :key="item.id" class="infinite-list-item">
                 <div class="avatar">
-                    <el-avatar src="https://www.bilibili.com/favicon.ico?v=1" />
+                    <el-avatar :src="item.avatar" />
                 </div>
                 <div class="user-name">
-                    <span>{{ item.name }}</span>
+                    <span>{{ item.username }}</span>
                 </div>
                 <span @click="openDia(item.id, item.identity)" class="identify">{{ item.identity }}</span>
             </li>
@@ -38,39 +38,53 @@
 
 <script setup lang="ts">
 import { joinerList_API, updateIdentify_API } from '@/api/joiner';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 const acd_id = defineModel('act_id', { default: 0 })
 const isCreator = defineModel('isCreator', { default: false })
+const joiner_drawer = defineModel('joiner_drawer', { default: false })
+
 const count = ref(0)
-onMounted(() => {
+
+watch(joiner_drawer, (new_, old_) => {
+    if (new_ === true) {
+        getAlljoiner()
+    }
+})
+
+const getAlljoiner = () => {
     joinerList_API(acd_id.value)
         .then(res => {
-            joinerList.value = res.data
-            count.value = res.data.length
+            if (res.data.code === 200) {
+                joinerList.value = res.data.data
+                count.value = res.data.data.length
+            }
         })
         .catch(err => {
             for (let i = 0; i < 25; i++)
                 joinerList.value.push({
                     id: 0,
-                    name: '加载失败',
+                    username: '加载失败',
                     avatar: 'https://www.bilibili.com/favicon.ico?v=1',
                     identity: i % 3 === 0 ? '演讲者' : '后勤',
-                    quanxain: i === 0 ? '创建者' : '参与者'
+                    quanxian: i === 0 ? '创建者' : '参与者'
                 })
         })
+}
+onMounted(() => {
+    getAlljoiner()
 })
 const joinerList = ref<{
     id: number,
-    name: string,
+    username: string,
     avatar: string,
     identity: string,
-    quanxain: string
+    quanxian: string
 }[]>([])
 
 const creatorList = computed(() => {
     return joinerList.value.filter(item => {
-        if (item.quanxain === '创建者') {
+        if (item.quanxian === '创建者') {
             return item
         }
     })
@@ -93,7 +107,9 @@ const openDia = (id: number, role: string) => {
 const submitIden = () => {
     updateIdentify_API(id_form.value)
         .then(res => {
-
+            if (res.data.code === 200) {
+                getAlljoiner()
+            }
         })
         .catch(err => {
             joinerList.value[id_form.value.id].identity = id_form.value.identity

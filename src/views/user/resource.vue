@@ -8,7 +8,7 @@
                     </el-table-column>
                     <el-table-column prop="activity_name" label="活动名" style="width: 25%;">
                     </el-table-column>
-                    <el-table-column prop="number" label="申请数量" style="width: 25%;">
+                    <el-table-column prop="num" label="申请数量" style="width: 25%;">
                     </el-table-column>
                     <el-table-column label="申请状态" style="min-width: 25%;">
                         <template #default="scope">{{ scope.row.state === 0 ? '待审核' : scope.row.state === 1 ? '已通过'
@@ -30,6 +30,7 @@ import type { resourceApplyList } from '@/models/resource';
 onMounted(() => {
     fetchAllResourceApply()
 })
+
 const expenseApplyList = ref<resourceApplyList[]>([])
 const fetchAllResourceApply = () => {
     getResourceApplyList()
@@ -43,7 +44,7 @@ const fetchAllResourceApply = () => {
                 expenseApplyList.value.push({
                     resource_name: '资源' + i,
                     activity_name: '活动' + i,
-                    number: i,
+                    num: i,
                     state: i % 3
                 })
             }

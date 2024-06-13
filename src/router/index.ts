@@ -1,4 +1,3 @@
-import component from "element-plus/es/components/tree-select/src/tree-select-option.mjs";
 import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
 
 
@@ -100,6 +99,18 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes
+})
+
+router.beforeEach((to, from, next) => {
+    if (to.name === "login") {
+        next()
+    } else {
+        if (!Boolean(localStorage.getItem("userToken")) && to.name !== "home" && to.name !== "search") {
+            next({ name: "login" })
+        } else {
+            next()
+        }
+    }
 })
 
 export default router

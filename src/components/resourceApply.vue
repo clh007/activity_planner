@@ -1,24 +1,14 @@
 <template>
     <div class="my-resource">
-        <div class="type">
-            <span>资源类型</span>
-            <el-select v-model="resource_type">
-                <el-option v-for="item in resource_typeList" :key="item.id" :value="item.type"></el-option>
-            </el-select>
-        </div>
         <div class="name">
             <span>资源名称</span>
             <el-select v-model="resource_name" @change="idChange">
                 <el-option v-for="item in resource_list" :key="item.id" :value="item.name"></el-option>
             </el-select>
         </div>
-        <div class="total">
-            <span>资源当前数量</span>
-            <span>{{ resourceTotal }}</span>
-        </div>
         <div class="number">
             <span>申请数量</span>
-            <el-input v-model="resource_form.number" placeholder="请输入申请数量"></el-input>
+            <el-input v-model="resource_form.num" placeholder="请输入申请数量"></el-input>
         </div>
         <div class="resource-time">
             <span>申请时间</span>
@@ -31,35 +21,12 @@
 
 
 <script setup lang="ts">
-import { getResourceListByType_API, getResourceList_API, getResourceType_API, submitResourceApply_API } from '@/api/resource';
+import { getResourceListAll_API, submitResourceApply_API } from '@/api/resource';
+import { useUserStore } from '@/store/user';
 import { ElMessage } from 'element-plus';
 import { computed, onMounted, ref, watch } from 'vue';
 
-
-const resource_type = ref('场地')
-const resource_typeList = ref<{ id: number, type: string }[]>([])
-
-const fetchResouceType = () => {
-    getResourceType_API()
-        .then(res => {
-            resource_typeList.value = res.data.data
-        })
-        .catch(err => {
-            for (let i = 0; i < 2; i++) {
-                resource_typeList.value.push({
-                    id: i,
-                    type: i % 2 === 0 ? '场地' : '设备'
-                })
-            }
-        })
-}
 onMounted(() => {
-    fetchResouceType()
-    fetchResourceList()
-})
-
-watch(resource_type, () => {
-    resource_list.value = []
     fetchResourceList()
 })
 
@@ -77,9 +44,10 @@ const resourceTotal = computed(() => {
 })
 
 const fetchResourceList = () => {
-    getResourceListByType_API(resource_type.value)
+    getResourceListAll_API()
         .then(res => {
-            resource_list.value = res.data.data
+            if (res.data.code === 200)
+                resource_list.value = res.data.data
         })
         .catch(err => {
             for (let i = 0; i < 2; i++) {
@@ -96,7 +64,8 @@ const resource_name = ref('')
 const resource_form = ref({
     activity_id: 0,
     resource_id: 0,
-    number: 0,
+    applyer_id: 0,
+    num: 0,
     start_time: '',
     end_time: ''
 })
@@ -110,6 +79,8 @@ const idChange = (value: any) => {
         }
     })
 }
+
+
 const submit_resourceApply = () => {
     if (resource_name.value === '') {
         ElMessage.warning("请选择申请资源")
@@ -119,16 +90,29 @@ const submit_resourceApply = () => {
         ElMessage.warning("请选择申请时间")
         return
     }
+    if (resource_form.value.num === 0) {
+        ElMessage.warning("请输入申请数量")
+        return
+    }
     resource_form.value.start_time = start_end.value[0]
     resource_form.value.end_time = start_end.value[1]
     resource_form.value.activity_id = act_id.value
-    console.log(resource_form)
+    resource_form.value.applyer_id = useUserStore().currentUser.id
+    // console.log(resource_form)
     submitResourceApply_API(resource_form.value)
         .then(res => {
             if (res.data.code === 200)
-                ElMessage.error("提交成功")
-        }).catch(err => {
-            ElMessage.error("提交失败")
+                ElMessage.success("提交成功")
+            else {
+                if (res.data.data.current_num) {
+                    ElMessage.error('资源不足，等待管理员审核')
+                }
+                else {
+                    ElMessage.error("提交失败")
+                }
+            }
+        })
+        .catch(err => {
         })
 }
 </script>

@@ -8,6 +8,6 @@ export interface addResourceFrom {
 export interface resourceApplyList {
     resource_name: string,
     activity_name: string,
-    number: number,
+    num: number,
     state: number
 }

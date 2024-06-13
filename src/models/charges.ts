@@ -8,7 +8,7 @@ export interface expense {
     id: number,
     username: string,
     activity_name: string,
-    account: number,
+    amount: number,
     reason: string
     state: number
 }

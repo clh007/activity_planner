@@ -10,28 +10,29 @@
             </div>
         </div>
         <div class="room-main" ref="room_main">
-            <div v-for="item in chatMessages" :class="['msg', item.id === currentUser.id ? 'msg-right' : 'msg-left']">
+            <div v-for="item in chatMessages"
+                :class="['msg', item.user_id === currentUser.id ? 'msg-right' : 'msg-left']">
                 <div class="room-avatar">
                     <el-avatar shape="square" :size="40" :src="item.avatar" />
                 </div>
                 <div class="msg-info">
                     <div class="msg-header">
-                        <div class="msg-name">{{ item.name }}</div>
-                        <div class="msg-time">{{ getDateDiff(item.time) }}</div>
+                        <div class="msg-name">{{ item.username }}</div>
+                        <div class="msg-time">{{ getDateDiff(item.send_time) }}</div>
                     </div>
                     <div v-if="item.type === 'text'" class="msg-content" :style="{ 'background-color': msgBgColor }">
-                        {{ item.content }}
+                        {{ item.context }}
                     </div>
                     <div v-if="item.type === 'img'" class="msg-content" :style="{ 'background-color': msgBgColor }">
-                        <el-image :src="item.content"></el-image>
+                        <el-image :src="item.context"></el-image>
                     </div>
                     <div v-if="item.type === 'file'" class="msg-content msg-file"
-                        :style="{ 'background-color': msgBgColor }" @click="downloadFile(item.content)">
+                        :style="{ 'background-color': msgBgColor }" @click="downloadFile(item.context)">
                         <el-icon>
                             <Folder />
                         </el-icon>
                         <span>[点击下载]</span>
-                        <div>{{ item.content.substring(item.content.indexOf('-') + 1) }}</div>
+                        <div>{{ item.context.substring(item.context.indexOf('-') + 1) }}</div>
                     </div>
                 </div>
             </div>
@@ -104,179 +105,41 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { UploadFilled, Folder } from '@element-plus/icons-vue'
 import { ElMessage, type UploadInstance, type UploadProps, type UploadRequestOptions } from 'element-plus';
+import { getDateDiff } from '@/utils/common';
+
 const message = ref("")
-const currentUser = ref({
-    id: 1,
-    name: '张三',
-    avatar: 'https://www.bilibili.com/favicon.ico?v=1'
-})
-const chatMessages = ref([
-    {
-        id: 2,
-        name: '李四',
-        avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: '你好啊',
-        type: "text",
-        time: '2021-01-01 12:00:00'
-    },
-    {
-        id: 3,
-        name: '王五',
-        avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: '你好啊',
-        type: "text",
-        time: '2021-01-01 12:00:00'
-    },
-    {
-        id: 4,
-        name: '王五',
-        avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: '你好啊',
-        type: "text",
-        time: '2021-01-01 12:00:00'
-    },
-    {
-        id: 5,
-        name: '王五',
-        avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: '你好啊',
-        type: "text",
-        time: '2021-01-01 12:00:00'
-    },
-    {
-        id: 6,
-        name: '王五',
-        avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: '你好啊',
-        type: "text",
-        time: '2021-01-01 12:00:00'
-    },
-    {
-        id: 7,
-        name: '王五',
-        avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: '你好啊',
-        type: "text",
-        time: '2021-01-01 12:00:00'
-    },
-    {
-        id: 8,
-        name: '王五',
-        avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: '你好啊',
-        type: "text",
-        time: '2021-01-01 12:00:00'
-    },
-    {
-        id: 9,
-        name: '王五',
-        avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: '你好啊',
-        type: "text",
-        time: '2021-01-01 12:00:00'
-    },
-    {
-        id: 12,
-        name: '王五',
-        avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: '你好啊',
-        type: "text",
-        time: '2021-01-01 12:00:00'
-    },
-    {
-        id: 21,
-        name: '王五',
-        avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: 'https://www.bilibili.com/favicon.ico?v=1',
-        type: "img",
-        time: '2021-01-01 12:00:00'
-    },
-    {
-        id: 1,
-        name: '张三',
-        avatar: 'https://www.bilibili.com/favicon.ico?v=1',
-        content: 'https://www.bilibili.com/favicon.ico?v=1',
-        type: "file",
-        time: '2024-05-25 12:00:00'
-    },
+const { currentUser } = storeToRefs(useUserStore())
+const chatMessages = ref<{
+    id: number,
+    user_id: number,
+    username: string,
+    avatar: string,
+    context: string,
+    type: string,
+    send_time: string
+}[]>([
 ])
+
+const loadMessages = () => {
+    loadMessages_API(act_id.value)
+        .then(res => {
+            if (res.data.code === 200)
+                chatMessages.value = res.data.data
+            else {
+                ElMessage.error(res.data.message)
+            }
+        })
+        .catch(err => {
+        })
+}
 
 const msgBgColor = computed(() => {
     return '#' + Math.floor(0xfafafa).toString(16);
 })
 
-const getDateDiff = (date: string) => {
-    let publishTime = Date.parse(date.replace(/-/gi, "/")) / 1000;
-    let d_seconds: number,
-        d_minutes: number,
-        d_hours: number,
-        d_days: number,
-        timeNow = Math.floor(new Date().getTime() / 1000),
-        d: number,
-        publishTime_ = new Date(publishTime * 1000),
-        Y = publishTime_.getFullYear(),
-        M = publishTime_.getMonth() + 1,
-        D = publishTime_.getDate(),
-        H = publishTime_.getHours(),
-        m = publishTime_.getMinutes(),
-        s = publishTime_.getSeconds(),
-        Y_, M_, D_, H_, m_, s_;
-
-    if (M < 10) {
-        M_ = "0" + M.toString();
-    }
-    else {
-        M_ = M.toString();
-    }
-    if (D < 10) {
-        D_ = "0" + D.toString();
-    }
-    else {
-        D_ = D.toString();
-    }
-    if (H < 10) {
-        H_ = "0" + H.toString();
-    } else {
-        H_ = H.toString();
-    }
-    if (m < 10) {
-        m_ = "0" + m.toString();
-    } else {
-        m_ = m.toString();
-    }
-    if (s < 10) {
-        s_ = "0" + s.toString();
-    } else {
-        s_ = s.toString();
-    }
-
-    d = timeNow - publishTime;
-    d_days = Math.floor(d / 86400);
-    d_hours = Math.floor(d / 3600);
-    d_minutes = Math.floor(d / 60);
-    d_seconds = Math.floor(d);
-
-    if (d_days > 0 && d_days < 3) {
-        return d_days + "天前";
-    } else if (d_days <= 0 && d_hours > 0) {
-        return d_hours + "小时前";
-    } else if (d_hours <= 0 && d_minutes > 0) {
-        return d_minutes + "分钟前";
-    } else if (d_seconds < 60) {
-        if (d_seconds <= 0) {
-            return "刚刚发表";
-        } else {
-            return d_seconds + "秒前";
-        }
-    } else if (d_days >= 3 && d_days < 30) {
-        return M_ + "-" + D_ + " " + H_ + ":" + m_;
-    } else if (d_days >= 30) {
-        return Y + "-" + M_ + "-" + D_ + " " + H_ + ":" + m_;
-    }
-}
 
 const kDown = (payload: KeyboardEvent) => {
     if ((payload.ctrlKey || payload.shiftKey) && payload.code === 'Enter') {
@@ -362,17 +225,23 @@ const ScrollToBottom = () => {
 const downloadFile = (url: string) => {
     window.open(url)
 }
-let username = window.btoa(encodeURI(currentUser.value.name))
+let username = window.btoa(encodeURI(currentUser.value.username))
 const peopleNumber = ref<number>(0)
 const chatroom_drawer = defineModel('chatroom_drawer',
     { default: false })
 
+const act_id = defineModel('act_id', { default: -1 })
 import { useMyWebSocketTokenStore } from '@/store/chatroom';
+import { useUserStore } from '@/store/user';
+import { storeToRefs } from 'pinia';
+import { loadMessages_API } from '@/api/chatroom';
+
+const url = `ws://localhost:8080/chatroom/${act_id.value}/${username}`
 let client: WebSocket | null = null
 watch(chatroom_drawer, (new_c, old_c) => {
     // console.log(new_c, old_c)
     if (new_c === true) {
-        client = useMyWebSocketTokenStore().initWebSocket(`ws://localhost:8080/chatroom/${username}`)
+        client = useMyWebSocketTokenStore().initWebSocket(url)
         client.onmessage = (msg_) => {
             if (msg_.data) {
                 console.log("服务端来消息：" + msg_.data)
@@ -390,13 +259,17 @@ watch(chatroom_drawer, (new_c, old_c) => {
             }
         }
     }
-    if (new_c === false && client)
+    if (new_c === false) {
+        console.log(1)
         useMyWebSocketTokenStore().closeWebSocket(client)
+    }
+
 }
 )
 
 onMounted(() => {
-    client = useMyWebSocketTokenStore().initWebSocket(`ws://localhost:8080/chatroom/${username}`)
+    loadMessages()
+    client = useMyWebSocketTokenStore().initWebSocket(url)
     client.onmessage = (msg_) => {
         if (msg_.data) {
             console.log("服务端来消息：" + msg_.data)
@@ -410,8 +283,13 @@ onMounted(() => {
             if (json.users) {
                 peopleNumber.value = json.users
             }
+
         }
     }
+})
+
+onUnmounted(() => {
+    useMyWebSocketTokenStore().closeWebSocket(client)
 })
 
 const sendMsg = () => {
@@ -421,12 +299,13 @@ const sendMsg = () => {
 
 const getOneMessage = (msg: string, type: string) => {
     return {
-        id: currentUser.value.id,
-        name: currentUser.value.name,
+        user_id: currentUser.value.id,
+        activity_id: act_id.value,
+        username: currentUser.value.username,
         avatar: currentUser.value.avatar,
-        content: msg,
+        context: msg,
         type: type,
-        time: FormateNowDate(),
+        send_time: FormateNowDate(),
     }
 }
 </script>

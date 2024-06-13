@@ -19,6 +19,8 @@
                     </el-table-column>
                     <el-table-column prop="location" label="活动地点" width="150">
                     </el-table-column>
+                    <el-table-column prop="state" label="活动状态" width="150">
+                    </el-table-column>
                     <el-table-column prop="start_time" label="开始时间" width="200">
                     </el-table-column>
                     <el-table-column prop="end_time" label="结束时间" width="200">
@@ -60,6 +62,16 @@
                 <el-date-picker v-model="activity_form.end_time" type="datetime"
                     value-format="YYYY-MM-DD HH:mm:ss"></el-date-picker>
             </div>
+            <div class="name">
+                <span>活动信息</span>
+                <el-input v-model="activity_form.info" placeholder="" type="textarea"></el-input>
+            </div>
+            <div class="name">
+                <span>活动状态</span>
+                <el-select v-model="activity_form.state">
+                    <el-option v-for="item in act_state" :label="item" :value="item"></el-option>
+                </el-select>
+            </div>
             <div class="location">
                 <span>活动地点</span>
                 <el-input v-model="activity_form.location"></el-input>
@@ -78,20 +90,23 @@
 </template>
 
 <script setup lang="ts">
-import { fetchActivitiesByKeyPub_API, fetchAllActivitiesPub_API, deleteActivity_API, updateActivity_API } from '@/api/activity';
+import { deleteActivity_API, updateActivity_API, fetchUserActivity_API } from '@/api/activity';
 import { useUserStore } from '@/store/user';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import type { Activity } from "@/models/avtivity";
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { dayjs } from 'element-plus';
 
 const router = useRouter()
 const search_key = ref('')
-
+const act_state = ref([
+    "报名中",
+    "进行中",
+    "已结束",
+])
 const activityList = ref<Activity[]>([])
-
 
 
 onMounted(() => {
@@ -104,14 +119,13 @@ const { currentUser } = storeToRefs(useUserStore())
 
 const searchActivity = () => {
     if (search_key.value == '') {
-        ElMessage.warning('请输入搜索关键字')
+        fetchAllActivities()
         return
     }
-    fetchActivitiesByKeyPub_API(search_key.value)
+    fetchUserActivity_API(currentUser.value.id, 'pub', search_key.value)
         .then(res => {
             if (res.data.code === 200) {
                 activityList.value = res.data.data
-                fetchAllActivities()
             } else {
                 ElMessage.error("请求失败")
             }
@@ -149,17 +163,16 @@ const activity_form = ref<Activity>({
     start_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
     end_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
     location: "string",
-    state: "string",
+    state: '',
     joiner_number: 1,
     max_num: 1,
 })
 
 const fetchAllActivities = () => {
-    fetchAllActivitiesPub_API()
+    fetchUserActivity_API(currentUser.value.id, 'pub', null)
         .then(res => {
             if (res.data.code === 200) {
                 activityList.value = res.data.data
-                fetchAllActivities()
             } else {
                 ElMessage.error("请求失败")
             }
@@ -185,7 +198,7 @@ const openUpdateAct_dia = (id: number) => {
     activity_form.value = JSON.parse(JSON.stringify(activityList.value[id]));
 }
 const updateActivity = () => {
-    console.log(activity_form.value)
+    // console.log(activity_form.value)
     updateActivity_API(activity_form.value)
         .then(res => {
             if (res.data.code === 200) {
@@ -200,15 +213,35 @@ const updateActivity = () => {
         })
 }
 
-const deleteActivity = (id: number) => {
+const deleteActivity = async (id: number) => {
     console.log(activityList.value[id])
-    deleteActivity_API(activityList.value[id].id)
-        .then(res => {
-            if (res.data.code === 200) {
-                activityList.value.splice(id, 1)
+    try {
+        const confirm = await ElMessageBox.confirm(`您确定要删除活动 "${activityList.value[id].name}" 吗 ?`,
+            '确认删除',
+            {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning',
             }
-            ElMessage.error(res.data.message)
-        })
+        );
+        if (confirm) {
+            deleteActivity_API(activityList.value[id].id)
+                .then(res => {
+                    if (res.data.code === 200) {
+                        activityList.value.splice(id, 1)
+                        ElMessage.success("删除成功")
+                    } else
+                        ElMessage.error(res.data.message)
+                })
+        }
+    }
+    catch (err) {
+        // 捕获用户取消操作导致的异常
+        if (err !== 'cancel') {
+            console.error(err);
+        }
+    }
+
 }
 
 const resource_dia = ref(false)

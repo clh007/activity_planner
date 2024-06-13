@@ -10,7 +10,7 @@
                 </div>
                 <div class="owner">
                     <span>组织者:</span>
-                    <span>{{ activity.username }}</span>
+                    <span>{{ activity.creator }}</span>
                 </div>
                 <div class="time">
                     <span>起止时间</span>
@@ -24,7 +24,8 @@
                     <span>活动状态</span>
                     <p>{{ activity.state }}</p>
                 </div>
-                <el-button class="take-part" type="primary" @click="takePartAct()">参与活动</el-button>
+                <el-button class="take-part" type="primary" @click="takePartAct()"
+                    :disabled="activity.is_join">参与活动</el-button>
             </div>
             <el-button class="share" circle type="warning" :icon="Share" @click="shareAct()">
             </el-button>
@@ -36,7 +37,7 @@
             </div>
             <div class="activity-bar">
                 <el-button @click="timeline_drawer = true">查看时间轴</el-button>
-                <el-button @click="chatroom_drawer = true">进入聊天室</el-button>
+                <el-button @click="enterChat()">进入聊天室</el-button>
                 <el-button @click="joiner_drawer = true">成员列表</el-button>
             </div>
         </div>
@@ -58,12 +59,13 @@
         </div>
         <div class="chat-container">
             <el-drawer v-model="chatroom_drawer" :with-header="false" title="聊天室" size="40%">
-                <chatroom v-model:chatroom_drawer="chatroom_drawer" />
+                <chatroom v-model:chatroom_drawer="chatroom_drawer" v-model:act_id="act_id" />
             </el-drawer>
         </div>
         <div class="join-container">
             <el-drawer v-model="joiner_drawer" :with-header="false" title="聊天室" size="40%">
-                <joinerList v-model:act_id="act_id" v-model:isCreator="isCreator" />
+                <joinerList v-model:act_id="act_id" v-model:isCreator="isCreator"
+                    v-model:joiner_drawer="joiner_drawer" />
             </el-drawer>
         </div>
         <el-drawer size="40%" v-model="addSchedule_drawer" title="添加一个日程" direction="ltr">
@@ -113,11 +115,11 @@ const getActivity = () => {
             activity.value = {
                 id: 0,
                 name: 'planner',
-                info: '你在干嘛哎呦1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111',
+                info: '你在干嘛哎呦',
                 location: '教室1',
                 start_time: '2022-05-01 00:00:00',
                 end_time: '2022-05-01 00:00:00',
-                username: '李晓坤',
+                creator: '李晓坤',
                 joiner_number: 666,
                 state: '进行中',
                 creator_id: currentUser.value.id
@@ -153,11 +155,26 @@ const shareAct = () => {
             ElMessage.error('分享失败')
         })
 }
+
+const is_join = ref(false)
+
+const enterChat = () => {
+    if (currentUser.value.id === -1) {
+        ElMessage.error('请先登录')
+        return
+    }
+    // 还要判断是否已经参与活动
+    if (!activity.value.is_join) {
+        ElMessage.warning('请先参加活动')
+        return
+    }
+    chatroom_drawer.value = true
+}
 </script>
 
 <style scoped>
 .container {
-    padding: 60px 20vw 0;
+    margin: 60px 20vw 0;
     display: flex;
     flex-direction: column;
     background: #e9e7e7;

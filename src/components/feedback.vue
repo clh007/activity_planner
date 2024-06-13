@@ -1,7 +1,7 @@
 <template>
     <h3>反馈区</h3>
     <div class="feedback-bar">
-        <el-input type="textarea" placeholder="输入反馈内容" v-model="fd_form.content" />
+        <el-input type="textarea" placeholder="输入反馈内容" v-model="fd_form.context" />
         <el-button type="info" @click="submitFeedBack()">提交</el-button>
     </div>
     <ul class="feedback-list">
@@ -14,7 +14,7 @@
                 </div>
             </div>
             <div class="content">
-                <span>{{ i.content }}</span>
+                <span>{{ i.context }}</span>
             </div>
         </li>
     </ul>
@@ -22,20 +22,23 @@
 
 <script lang="ts" setup>
 import { getFeedBack_API, submitFeedBack_API } from '@/api/feedback';
+import { ElMessage } from 'element-plus';
 import { onMounted, ref } from 'vue'
 
 const feedBackList = ref<{
     id: number,
     avatar: string,
     username: string,
-    content: string
+    context: string
 }[]>([])
 
 const act_id = defineModel('act_id', { default: 0 })
+
 const loadFeedBack = () => {
     getFeedBack_API(act_id.value)
         .then((res) => {
-            feedBackList.value = res.data
+            if (res.data.code === 200)
+                feedBackList.value = res.data.data
         })
         .catch((err) => {
             for (let i = 0; i < 10; i++) {
@@ -43,7 +46,7 @@ const loadFeedBack = () => {
                     id: i,
                     avatar: 'https://www.bilibili.com/favicon.ico?v=1',
                     username: '匿名用户',
-                    content: 'hhh'
+                    context: 'hhh'
                 })
             }
         })
@@ -54,14 +57,20 @@ onMounted(() => {
 })
 
 const fd_form = ref({
-    act_id: act_id.value,
-    content: ''
+    activity_id: act_id.value,
+    context: ''
 })
 
 const submitFeedBack = () => {
     submitFeedBack_API(fd_form.value)
         .then((res) => {
-            loadFeedBack()
+            if (res.data.code === 200) {
+                fd_form.value.context = ''
+                loadFeedBack()
+            }
+            else {
+                ElMessage.error(res.data.message)
+            }
         })
         .catch((err) => {
         })

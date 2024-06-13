@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { fetchActivitiesByKeyPar_API, fetchAllActivitiesPar_API, deleteActivity_API, updateActivity_API } from '@/api/activity';
+import { fetchUserActivity_API } from '@/api/activity';
 import { useUserStore } from '@/store/user';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref } from 'vue';
@@ -80,10 +80,10 @@ const { currentUser } = storeToRefs(useUserStore())
 
 const searchActivity = () => {
   if (search_key.value == '') {
-    ElMessage.warning('请输入搜索关键字')
+    fetchAllActivities()
     return
   }
-  fetchActivitiesByKeyPar_API(search_key.value)
+  fetchUserActivity_API(currentUser.value.id, 'pub', search_key.value)
     .then(res => {
       if (res.data.code === 200) {
         activityList.value = res.data.data
@@ -110,11 +110,10 @@ const searchActivity = () => {
 }
 
 const fetchAllActivities = () => {
-  fetchAllActivitiesPar_API()
+  fetchUserActivity_API(currentUser.value.id, 'par', null)
     .then(res => {
       if (res.data.code === 200) {
         activityList.value = res.data.data
-        fetchAllActivities()
       } else {
         ElMessage.error("请求失败")
       }
@@ -156,6 +155,7 @@ const submit_expense = () => {
     ElMessage.warning('请输入报销说明')
     return
   }
+
   submitExpense_API(expense_form.value)
     .then(res => {
       if (res.data.code === 200) {
@@ -163,7 +163,7 @@ const submit_expense = () => {
         expenseReim_Dia.value = false
         reset()
       } else {
-        ElMessage.error("提交失败")
+        ElMessage.error(res.data.message)
       }
     })
     .catch(err => {

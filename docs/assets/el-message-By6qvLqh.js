@@ -1,0 +1,1 @@
+import{ac as a,r}from"./index-Cryq6cDr.js";const i=a("webInfoStore",()=>{const o=r({topbar_entry:!1,topbar_hoveEntry:!1,topbar_visible:!0}),t=r(!1);return{topbar:o,is_login:t,login:()=>{t.value=!0},logout:()=>{t.value=!1},setTopbar:e=>{o.value.topbar_entry=e.topbar_entry,o.value.topbar_visible=e.topbar_visible}}});export{i as u};

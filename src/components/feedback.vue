@@ -25,12 +25,14 @@ import { getFeedBack_API, submitFeedBack_API } from '@/api/feedback';
 import { ElMessage } from 'element-plus';
 import { onMounted, ref } from 'vue'
 
-const feedBackList = ref<{
+const feedBackList = defineModel<{
     id: number,
     avatar: string,
     username: string,
     context: string
-}[]>([])
+}[]>('feedBackList', {
+    default: []
+})
 
 const act_id = defineModel('act_id', { default: 0 })
 

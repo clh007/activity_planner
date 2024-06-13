@@ -29,9 +29,11 @@
                     </el-table-column>
                     <el-table-column prop="max_num" label="最大参与者数量" width="150">
                     </el-table-column>
-                    <el-table-column fixed="right" label="操作" header-align="center" min-width="250">
+                    <el-table-column fixed="right" label="操作" header-align="center" min-width="450">
                         <template #default="scope">
                             <div class="handler  myCenter">
+                                <el-button type="info">查看支出</el-button>
+                                <el-button type="info">发送通知</el-button>
                                 <el-button @click.native.prevent="openResource(scope.$index)" type="info">
                                     资源申请
                                 </el-button>
@@ -142,17 +144,7 @@ const searchActivity = () => {
                     info: "服务器崩溃了",
                     max_num: 1,
                     joiner_number: 1,
-                }, {
-                    id: 1,
-                    name: '服务器崩溃了',
-                    creator: '服务器崩溃了',
-                    start_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-                    end_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-                    location: '服务器崩溃了',
-                    info: "服务器崩溃了",
-                    max_num: 1,
-                    joiner_number: 1,
-                },
+                }
             ]
         })
 }

@@ -24,8 +24,11 @@
                     <span>活动状态</span>
                     <p>{{ activity.state }}</p>
                 </div>
-                <el-button class="take-part" type="primary" @click="takePartAct()"
-                    :disabled="activity.is_join">参与活动</el-button>
+                <div class="button">
+                    <el-button class="take-part" type="primary" @click="takePartAct()"
+                        :disabled="activity.is_join">参与活动</el-button>
+                    <el-button class="to-word" type="primary" @click="toWord()" v-if="isCreator">生成活动报告</el-button>
+                </div>
             </div>
             <el-button class="share" circle type="warning" :icon="Share" @click="shareAct()">
             </el-button>
@@ -42,7 +45,7 @@
             </div>
         </div>
         <div class="feedback-container">
-            <feedback v-model:act_id="act_id" />
+            <feedback v-model:act_id="act_id" v-model:feedBackList="feedBackList" />
         </div>
         <div class="timeline-container">
             <el-drawer v-model="timeline_drawer" title="活动日程" size="40%">
@@ -86,7 +89,7 @@ import { storeToRefs } from 'pinia';
 import type { Activity } from '@/models/avtivity';
 import { useRouter } from 'vue-router';
 import { getActivity_API, takePartActive_API } from '@/api/activity';
-import { ElMessage } from 'element-plus'
+import { ElMessage, dayjs } from 'element-plus'
 
 const { currentUser } = storeToRefs(useUserStore())
 const timeline_drawer = ref(false);
@@ -169,6 +172,83 @@ const enterChat = () => {
         return
     }
     chatroom_drawer.value = true
+}
+
+import { Document, Packer, Paragraph } from 'docx';
+import { saveAs } from 'file-saver';
+
+const feedBackList = ref<{
+    id: number,
+    avatar: string,
+    username: string,
+    context: string
+}[]>([])
+
+const toWord = async () => {
+    // if (activity.value.state !== '已结束') {
+    //     ElMessage.warning('活动还未结束')
+    //     return
+    // }
+
+    ElMessage.success('正在生成word文件')
+    const activityReport = {
+        title: '活动报告' + activity.value.name,
+        date: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        content: [
+            {
+                type: 'Heading2',
+                text: `活动名称：${activity.value.name}`,
+            },
+            {
+                type: 'Heading2',
+                text: `活动地点：${activity.value.location}`,
+            },
+            {
+                type: 'Heading2',
+                text: `活动时间：${activity.value.start_time} - ${activity.value.end_time}`,
+            },
+            {
+                type: 'Heading2',
+                text: `活动简介：${activity.value.info}`,
+            },
+            {
+                type: 'Heading2',
+                text: `参与人数：${activity.value.joiner_number === undefined ? 0 : activity.value.joiner_number}`,
+            },
+            {
+                type: 'Heading2',
+                text: `活动反馈：`,
+            },
+            feedBackList.value.map((item) => {
+                return {
+                    type: 'paragraph',
+                    text: `${item.username} : ${item.context}`,
+                }
+            })
+        ],
+    };
+    const doc = new Document({
+        sections: [
+            {
+                children: [
+                    new Paragraph({
+                        text: `${activityReport.title}`,
+                        alignment: 'center',
+                        heading: 'Heading1',
+                    }),
+                    new Paragraph({
+                        text: `生成报告日期：${activityReport.date}`,
+                        heading: 'Heading2',
+                    }),
+                ]
+            }
+        ]
+    })
+
+    const blob = await Packer.toBlob(doc)
+
+    saveAs(blob, 'activityReport.docx')
+    ElMessage.success('成功生成word文件 ' + 'activityReport.docx')
 }
 </script>
 
@@ -272,6 +352,11 @@ const enterChat = () => {
 
 .take-part {
     width: 6vw;
+    margin-top: 12px;
+}
+
+.to-word {
+    width: 7vw;
     margin-top: 12px;
 }
 

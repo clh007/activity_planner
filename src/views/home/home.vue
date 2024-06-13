@@ -194,7 +194,6 @@ const loadNewNotice = () => {
         }
         )
         .catch((err) => {
-
         })
 }
 
@@ -207,9 +206,9 @@ onMounted(() => {
 
 const isloading = ref(false)
 
-const markAsRead = (item) => {
+const markAsRead = (item: Notice) => {
     // 执行将通知标记为已读的逻辑
-    item.isRead = true;
+    item.state = '已读';
 };
 </script>
 

@@ -51,4 +51,7 @@ declare module 'vue' {
     Topbar: typeof import('./src/components/topbar.vue')['default']
     Uploadpicture: typeof import('./src/components/uploadpicture.vue')['default']
   }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
+  }
 }

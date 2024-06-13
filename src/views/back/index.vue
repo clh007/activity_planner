@@ -20,6 +20,7 @@
           </template>
           <el-menu-item @click="router.push({ name: 'activitytemplate' })" index="2-1">活动模板</el-menu-item>
           <el-menu-item @click="router.push({ name: 'activitylist' })" index="2-2">所有活动</el-menu-item>
+          <el-menu-item @click="router.push({ name: 'noticetemplate' })" index="2-3">通知模板</el-menu-item>
         </el-sub-menu>
         <el-menu-item index="3">
           <el-icon>

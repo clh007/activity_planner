@@ -103,7 +103,7 @@
 
 <script setup lang="ts">
 import { getHotActivity_API, getActivityListByKeyword_API } from '@/api/activity';
-import { getNewNotice_API } from '@/api/notice';
+import { getNewNotice_API , readNotice_API} from '@/api/notice';
 import type { Activity } from '@/models/avtivity';
 import type { Notice } from '@/models/notice';
 import { ArrowDown, DArrowRight, Reading } from '@element-plus/icons-vue'
@@ -207,9 +207,10 @@ onMounted(() => {
 
 const isloading = ref(false)
 
-const markAsRead = (item) => {
+const markAsRead = (item:Notice) => {
     // 执行将通知标记为已读的逻辑
-    item.isRead = true;
+    readNotice_API(item.id);
+    item.state = '已读';
 };
 </script>
 

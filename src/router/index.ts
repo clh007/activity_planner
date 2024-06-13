@@ -93,6 +93,11 @@ const routes = [
                         path: "activitytemplate",
                         name: "activitytemplate",
                         component: () => import('@/views/back/activitytemplate.vue'),
+                    },
+                    {
+                        path: "noticetemplate",
+                        name: "noticetemplate",
+                        component: () => import('@/views/back/noticetemplate.vue'),
                     }
                 ],
             },

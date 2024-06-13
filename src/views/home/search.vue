@@ -55,6 +55,17 @@ const getActivityByKey = () => {
     isloading.value = true
     getActivityListByKeyword_API('name', search_key.value, curPage.value, pageSize.value)
         .then((res) => {
+            if (res.data.code === 200)
+                if (res.data.data.totalElements === 0) {
+                    nextPage.value === false
+                } else {
+                    search_activities.value.push(...res.data.data.content)
+                }
+            else {
+
+            }
+            isloading.value = false
+
         })
         .catch((err) => {
             if (curPage.value < 3) {

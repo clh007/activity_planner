@@ -46,10 +46,10 @@
         </el-form-item>
 
         <!-- 动态显示输入框 -->
-        <template v-if="resourceAddForm.name ===  '其他'">
+        <template v-if="resourceAddForm.name === '其他'">
           <el-form-item label="添加的资源名称" prop="newname">
             <el-input v-model="resourceAddForm.newname" autocomplete="off" placeholder="请输入添加的资源名称"></el-input>
-        </el-form-item>
+          </el-form-item>
           <el-form-item label="总数量" prop="total_num">
             <el-input v-model.number="resourceAddForm.total_num" autocomplete="off" placeholder="请输入总数量"></el-input>
           </el-form-item>
@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { addResource_API, getResourceList_API, getResourceListByKeyword_API, deleteResource_API } from '@/api/resource'; // 从api文件夹导入接口
 import { reactive, ref, onMounted } from 'vue';
-import { FormInstance, FormRules, ElMessageBox } from 'element-plus';
+import { type FormInstance, type FormRules, ElMessageBox } from 'element-plus';
 
 const resourceAddDialogVisible = ref(false);
 const resourceAddForm = ref({
@@ -101,7 +101,7 @@ const currentPage = ref(1); // 当前页码
 const searchType = ref(''); // 搜索类型
 const searchKeyword = ref(''); // 搜索关键词
 
-const resourceList = ref([{ id: 0, name: '' , total_num: 0, current_num:0}]);
+const resourceList = ref([{ id: 0, name: '', total_num: 0, current_num: 0 }]);
 
 
 onMounted(async () => {
@@ -189,7 +189,7 @@ const addResource = async () => {
 // 删除资源
 const delResource = async (index: number, resourceList: Array<any>) => {
   const resource = resourceList[index];
-  
+
   try {
     const confirm = await ElMessageBox.confirm(
       `您确定要删除资源 "${resource.name}" 吗？`,

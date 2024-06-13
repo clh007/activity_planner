@@ -19,7 +19,8 @@
                             <el-button type="primary" @click.native.prevent.stop="readNotice($index, noticeList)">
                                 已读
                             </el-button>
-                            <el-button type="primary" @click="router.push({ name: 'activity', params: { id: $index } })">
+                            <el-button type="primary"
+                                @click="router.push({ name: 'activity', params: { id: $index } })">
                                 前往该活动
                             </el-button>
                         </template>
@@ -54,7 +55,7 @@ const fetchAllNotices = () => {
                 noticeList.value.push({
                     id: i,
                     activity_id: i * 10,
-                    type_id: i * 100,
+                    notice_type_id: i * 100,
                     context: `这是第${i}个通知`,
                     send_time: new Date().toLocaleString(),
                     state: `未读`,
@@ -65,12 +66,12 @@ const fetchAllNotices = () => {
 
 const readNotice = async (index: number, noticelist: Array<any>) => {
     const notice = noticelist[index];
-    if(notice.state == '未读'){
+    if (notice.state == '未读') {
         await readNotice_API(notice.id);
         fetchAllNotices();
     }
-    else{
-        
+    else {
+
     }
 }
 

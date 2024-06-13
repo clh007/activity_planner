@@ -108,7 +108,7 @@
 <script setup lang="ts">
 import { addUser_API, getUserList_API, updatePassword_API, deleteUser_API } from '@/api/user'; // 从api文件夹导入接口
 import { reactive, ref, onMounted } from 'vue';
-import { FormInstance, FormRules, ElMessageBox } from 'element-plus';
+import { type FormInstance, type FormRules, ElMessageBox } from 'element-plus';
 
 const userAddDialogVisible = ref(false);
 const userAddForm = ref({

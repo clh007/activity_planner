@@ -32,8 +32,8 @@
                     <el-table-column fixed="right" label="操作" header-align="center" min-width="450">
                         <template #default="scope">
                             <div class="handler  myCenter">
-                                <el-button type="info">查看支出</el-button>
-                                <el-button type="info">发送通知</el-button>
+                                <el-button type="info" @click="openFeeListDia(scope.$index)">查看支出</el-button>
+                                <el-button type="info" @click="openNoticeDia(scope.$index)">发送通知</el-button>
                                 <el-button @click.native.prevent="openResource(scope.$index)" type="info">
                                     资源申请
                                 </el-button>
@@ -88,6 +88,39 @@
         <el-dialog title="资源申请" v-model="resource_dia">
             <resource-apply v-model="act_id" />
         </el-dialog>
+
+        <el-dialog title="发起通知" v-model="notice_dia">
+            <div class="notice-template">
+                <span>
+                    选择通知模板
+                </span>
+                <el-select v-model="notice_form.notice_type_id" placeholder="选择通知模板"
+                    :change="noticetemChange(notice_form.notice_type_id)">
+                    <el-option v-for="item in notice_temlist" :key="item.id" :label="item.notice_type" :value="item.id">
+                    </el-option>
+                </el-select>
+            </div>
+
+            <el-input v-model="notice_form.context" placeholder="请输入通知内容"></el-input>
+
+            <el-button type="info" @click="addNotice()">提交</el-button>
+        </el-dialog>
+
+        <el-dialog v-model="feelist_dia" title="支出清单">
+            <el-table :data="feelist" max-height="500">
+                <el-table-column prop="fee" label="金额" width="180" />
+                <el-table-column prop="context" label="金额" width="180" />
+            </el-table>
+            <div class="actu-char">
+                <span>实际支出</span>
+                <el-input v-model="act_actual_charge" disabled placeholder="输入实际支出"></el-input>
+            </div>
+            <div class="charge">
+                <span>活动预算</span>
+                <el-input v-model="chargeFrm.booking_fee" placeholder="输入活动预算"></el-input>
+                <el-button type="info" @click="updateCharge()">提交</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -95,11 +128,15 @@
 import { deleteActivity_API, updateActivity_API, fetchUserActivity_API } from '@/api/activity';
 import { useUserStore } from '@/store/user';
 import { storeToRefs } from 'pinia';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import type { Activity } from "@/models/avtivity";
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { dayjs } from 'element-plus';
+import resourceApply from '@/components/resourceApply.vue';
+import type { Notice, noticeTemplateForm } from '@/models/notice';
+import { addNotice_API, fetchAllNoticeTemplates_API } from '@/api/notice';
+import { loadFeelist_API, updateCharge_API } from '@/api/charges';
 
 const router = useRouter()
 const search_key = ref('')
@@ -242,6 +279,111 @@ const openResource = (index: number) => {
     resource_dia.value = true
     act_id.value = activityList.value[index].id
 }
+
+const notice_dia = ref(false)
+const notice_form = ref<Notice>({
+    id: -1,
+    activity_id: -1,
+    notice_type_id: -1,
+    context: '',
+    send_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+    state: ''
+})
+
+const notice_temlist = ref<noticeTemplateForm[]>([{
+    id: -1,
+    notice_type: '自定义',
+    context: ''
+}])
+
+const openNoticeDia = (index: number) => {
+    notice_dia.value = true
+    notice_form.value.activity_id = activityList.value[index].id
+    fetchAllNoticeTemplates_API()
+        .then(res => {
+            if (res.data.code === 200) {
+                notice_temlist.value = res.data.data
+            } else {
+                ElMessage.error("请求模板失败", res.data.message)
+            }
+        })
+}
+
+
+const addNotice = () => {
+    if (notice_form.value.context === '') {
+        ElMessage.warning("请输入通知内容")
+        return
+    }
+
+    addNotice_API(notice_form.value)
+        .then(res => {
+            if (res.data.code === 200) {
+                ElMessage.success("添加成功")
+            } else {
+                ElMessage.error("添加失败", res.data.message)
+            }
+        })
+        .catch(err => { })
+}
+
+const noticetemChange = (index: number) => {
+    notice_temlist.value.forEach((item, i) => {
+        if (item.id === index) {
+            notice_form.value.context = item.context
+            return
+        }
+    })
+}
+
+const feelist_dia = ref(false)
+const feelist = ref<{
+    fee: number,
+    context: string
+}[]>([])
+const openFeeListDia = (index: number) => {
+    feelist_dia.value = true
+    act_id.value = activityList.value[index].id
+    loadFeelist_API(activityList.value[index].id)
+        .then(res => {
+            if (res.data.code === 200)
+                feelist.value = res.data.data
+            else {
+                ElMessage.error(res.data.message)
+            }
+        })
+        .catch(err => {
+        })
+}
+
+const chargeFrm = ref({
+    activity_id: 0,
+    booking_fee: 0,
+    actual_fee: 0,
+})
+
+const updateCharge = () => {
+    chargeFrm.value.actual_fee = act_actual_charge.value
+    chargeFrm.value.activity_id = act_id.value
+    updateCharge_API(chargeFrm.value)
+        .then(res => {
+            if (res.data.code == 200)
+                ElMessage.success(res.data.message)
+            else {
+                ElMessage.error(res.data.message)
+            }
+        })
+        .catch(err => {
+        })
+}
+
+const act_actual_charge = computed(() => {
+    let sum = 0
+    feelist.value.forEach(item => {
+        sum += item.fee
+    })
+    return sum
+})
 </script>
 
 <style scoped>

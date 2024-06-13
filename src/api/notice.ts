@@ -1,4 +1,4 @@
-import type { Notice,noticeTemplateAddForm } from "@/models/notice";
+import type { Notice, noticeTemplateAddForm } from "@/models/notice";
 import request from "@/utils/request"
 
 
@@ -51,6 +51,14 @@ export const deleteNoticeTemplate_API = (template_id: number) => { return reques
 
 
 // 请求所有通知模板
-export const fetchAllTemplates_API = () => {
+export const fetchAllNoticeTemplates_API = () => {
     return request.get('/notice/templates');
+};
+
+// 请求所有通知模板
+export const addNotice_API = (data: Notice) => {
+    return request.post('/notice/createnotice', JSON.stringify(data),
+        {
+            headers: { 'Content-Type': 'application/json' }
+        });
 };

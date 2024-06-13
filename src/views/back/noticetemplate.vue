@@ -73,7 +73,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
-import { FormInstance, FormRules, ElMessageBox, ElMessage } from 'element-plus';
+import { type FormInstance, type FormRules, ElMessageBox, ElMessage } from 'element-plus';
 // 从api文件夹导入接口 (假设您已经定义了这些接口)
 import {
     addNoticeTemplate_API,

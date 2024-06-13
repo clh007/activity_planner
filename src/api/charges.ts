@@ -16,3 +16,18 @@ export const fetchAllExpense_API = (type: number) => {
 export const updateExpenseState_API = (state: number, id: number) => {
     return request.put('/expense/check', qs.stringify({ 'state': state, 'id': id }))
 }
+
+export const loadFeelist_API = (act_id: number) => {
+    return request.get('/fee/all' + `?act_id=${act_id}`)
+}
+
+
+export const updateCharge_API = (data: {
+    activity_id: number,
+    booking_fee: number,
+    actual_fee: number,
+}) => {
+    return request.post('/fee/update', JSON.stringify(data), {
+        headers: { 'Content-Type': 'application/json' }
+    })
+}

@@ -89,14 +89,15 @@
 </template>
 
 <script setup lang="ts">
-import { addActivity_API, getActivityList_API, getActivityListByKeyword_API, deleteActivity_API } from '@/api/activity'; // 从api文件夹导入接口
+import { addActivity_API, getActivityListByKeyword_API, deleteActivity_API } from '@/api/activity'; // 从api文件夹导入接口
 import { reactive, ref, onMounted } from 'vue';
-import { FormInstance, FormRules, ElMessageBox } from 'element-plus';
+import { type FormInstance, type FormRules, ElMessageBox } from 'element-plus';
 
 const activityAddDialogVisible = ref(false);
 const activityAddForm = ref({
+  id: 0,
   name: '',
-  creator_id: '',
+  creator_id: 0,
   info: '',
   start_time: '',
   end_time: '',

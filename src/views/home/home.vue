@@ -54,7 +54,7 @@
                                         <span class="read-dot" v-if="item.state === '未读'"></span>
                                     </el-icon>
                                     <span class="icon-title">
-                                        {{ item.type_id }}
+                                        {{ item.notice_type_id }}
                                     </span>
                                 </div>
                                 <p class="content_sys">

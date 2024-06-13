@@ -91,7 +91,7 @@
 <script setup lang="ts">
 import { addTemplate_API, getTemplateList_API, updateTemplate_API, deleteTemplate_API } from '@/api/template'; // 从api文件夹导入接口
 import { reactive, ref, onMounted } from 'vue';
-import { FormInstance, FormRules, ElMessageBox } from 'element-plus';
+import { type FormInstance, type FormRules, ElMessageBox } from 'element-plus';
 
 const templateList = ref([]);
 const templateAddDialogVisible = ref(false);
@@ -269,4 +269,4 @@ const delTemplate = async (index: number) => {
   justify-content: center;
   margin-top: 20px;
 }
-</style>
+</style>type FormInstancetype FormRules

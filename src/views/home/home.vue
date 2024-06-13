@@ -28,9 +28,11 @@
                             <el-carousel>
                                 <el-carousel-item v-for="item in hot_activities">
                                     <div class="banner-item">
-                                        <h2 class="title">{{ item.title }}</h2>
-                                        <p class="content">{{ item.content }}</p>
-                                        <el-image :src="item.image" fit="cover" class="image"></el-image>
+                                        <h2 class="title">{{ item.name }}</h2>
+                                        <p class="content">{{ item.info }}</p>
+                                        <el-image :src="item.picture"
+                                            @click="router.push({ name: 'activity', params: { id: item.id } })"
+                                            fit="cover" class="image"></el-image>
                                     </div>
                                 </el-carousel-item>
                             </el-carousel>
@@ -38,23 +40,25 @@
                     </div>
                     <div class="header-right">
                         <h4 class="title-right">
-                            系统公告
-                            <el-icon class="el-icon-vertical">
+                            最新通知
+                            <el-icon class="el-icon-vertical" @click="router.push({ name: 'notice' })">
                                 <DArrowRight />
                             </el-icon>
                         </h4>
                         <ul class="list-right">
-                            <li v-for="itme in sys_message">
+                            <li v-if="sys_message.length === 0">暂无通知</li>
+                            <li v-else v-for="item in sys_message">
                                 <div class="sys_title">
-                                    <el-icon class="el-icon-vertical ">
+                                    <el-icon class="el-icon-vertical" @click="markAsRead(item)">
                                         <Reading />
+                                        <span class="read-dot" v-if="item.state === '未读'"></span>
                                     </el-icon>
                                     <span class="icon-title">
-                                        {{ itme.title }}
+                                        {{ item.type_id }}
                                     </span>
                                 </div>
                                 <p class="content_sys">
-                                    {{ itme.content }}
+                                    {{ item.context }}
                                 </p>
                             </li>
                         </ul>
@@ -98,8 +102,10 @@
 </template>
 
 <script setup lang="ts">
-import { getActivityListPage_API } from '@/api/activity';
+import { getHotActivity_API, getActivityListByKeyword_API } from '@/api/activity';
+import { getNewNotice_API } from '@/api/notice';
 import type { Activity } from '@/models/avtivity';
+import type { Notice } from '@/models/notice';
 import { ArrowDown, DArrowRight, Reading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
@@ -108,19 +114,10 @@ const url = 'https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpe
 const printInfo = ref("2024 05 23")
 
 const router = useRouter()
-const hot_activities = [{ title: "1", content: "111111", image: "https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" },
-{ title: "2", content: "2222", image: "https://images.pexels.com/photos/23540856/pexels-photo-23540856.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" },]
+const hot_activities = ref<Activity[]>([]);
 
-const sys_message = [{
-    title: "系统公告1",
-    content: "我在睡觉,别打扰我11111111111111111111111111111111111111111111111111111111111111111111111111111111",
-}, {
-    title: "系统公告2",
-    content: "我在睡觉，别打扰我",
-}, {
-    title: "系统公告3",
-    content: "我在睡觉，别打扰我",
-}]
+
+const sys_message = ref<Notice[]>([]);
 
 const nextPage = ref(true)
 
@@ -142,17 +139,18 @@ const loadHomeActivities = () => {
     }
     isloading.value = true
     curPage.value += 1
-    getActivityListPage_API(curPage.value, pageSize.value)
+    getActivityListByKeyword_API('', '', curPage.value, pageSize.value)
         .then((res) => {
             if (res.data.code === 200)
-                if (res.data.data.length === 0) {
+                if (res.data.data.totalElements === 0) {
                     nextPage.value === false
                 } else {
-                    home_activities.value.push(...res.data.data)
+                    home_activities.value.push(...res.data.data.content)
                 }
             else {
 
             }
+            isloading.value = false
         })
         .catch((err) => {
             if (curPage.value < 3) {
@@ -171,12 +169,48 @@ const loadHomeActivities = () => {
             isloading.value = false
         })
 }
+
+const loadHotActivities = () => {
+    getHotActivity_API()
+        .then((res) => {
+            if (res.data.code === 200) {
+                hot_activities.value.push(...res.data.data)
+            }
+        }
+        )
+        .catch((err) => {
+
+        })
+}
+
+const loadNewNotice = () => {
+    getNewNotice_API()
+        .then((res) => {
+            console.log("===========")
+            console.log(res.data)
+            if (res.data.code === 200) {
+                sys_message.value.push(...res.data.data)
+            }
+        }
+        )
+        .catch((err) => {
+
+        })
+}
+
+
 onMounted(() => {
     loadHomeActivities()
+    loadHotActivities()
+    loadNewNotice()
 })
 
 const isloading = ref(false)
 
+const markAsRead = (item) => {
+    // 执行将通知标记为已读的逻辑
+    item.isRead = true;
+};
 </script>
 
 <style scoped>
@@ -400,6 +434,15 @@ const isloading = ref(false)
 
 .nextPage:hover {
     color: #409eff;
+}
+
+.read-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: red;
+    margin-left: 4px;
 }
 
 /* #endregion*/

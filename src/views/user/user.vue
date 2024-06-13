@@ -21,6 +21,7 @@
                     </template>
                     <el-menu-item index="2-1" @click="router.push({ name: 'expense' })">费用管理</el-menu-item>
                     <el-menu-item index="2-2" @click="router.push({ name: 'resource' })">资源管理</el-menu-item>
+                    <el-menu-item index="2-3" @click="router.push({ name: 'notice' })">通知管理</el-menu-item>
                 </el-sub-menu>
                 <el-menu-item index="3" @click="router.push({ name: 'userinfo' })">
                     <el-icon>

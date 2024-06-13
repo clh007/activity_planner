@@ -48,6 +48,12 @@ export const getActivityListPage_API = (curPage: number, pageSize: number) => {
     return request.post('/activity/list')
 }
 
+//热门活动
+export const getHotActivity_API = () => {
+    return request.post('/activity/hot')
+}
+
+
 //关键字查询活动
 export const getActivityListByKeyword_API = (type: string, keyword: string, page: number, size: number) => {
     return request.post('/activity/search', {

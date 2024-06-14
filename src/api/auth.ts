@@ -60,7 +60,7 @@ export const getVerificationCode_API = (identifier: string, type: 'email' | 'pho
  * @param account 用户账户名，可以是邮箱、手机
  * @returns 返回一个Promise，解析后的结果是请求的响应数据。
  */
-export const findPD_API = (account: string) => {
+export const findPD_API = (account: string, password: string, code: string) => {
     // 构造请求URL，查询指定账户的密码重置接口
-    return request.get('/auth/find/password?account=' + account);
+    return request.get('/auth/find/password?' + `account=${account}&&password=${password}&&code=${code}`);
 }

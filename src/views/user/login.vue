@@ -46,6 +46,9 @@
 
     <el-dialog title="密码找回" v-model="is_findPW" width="25%" center>
       <input class="form__input" type="text" placeholder="邮箱/手机号" v-model="account" />
+      <input class="form__input" type="text" placeholder="新密码" v-model="password" />
+      <input class="form__input" style="width: 200px;" type="text" placeholder="验证码" v-model="code">
+      <span @click="getcodeForPW()" style="cursor: pointer;padding-left: 10px;">获取验证码</span>
       <template #footer>
         <el-button type="info" @click="submitFindPD()">提交</el-button>
       </template>
@@ -189,12 +192,17 @@ const getcode = () => {
     } else {
       getVerificationCode_API(account.value, "phone")
         .then(res => {
+          if (res.data.code === 200) {
+            ElMessage.success("获取成功!")
+          } else {
+            ElMessage.error(res.data.message)
+          }
           console.log(res.data)
         })
         .catch(err => {
           console.log(err)
         })
-      ElMessage.success("获取成功!")
+
     }
   } else {
     // 如果账号验证状态为邮箱，检查账号是否为有效邮箱
@@ -204,6 +212,11 @@ const getcode = () => {
     } else {
       getVerificationCode_API(account.value, "email")
         .then(res => {
+          if (res.data.code === 200) {
+            ElMessage.success("获取成功!")
+          } else {
+            ElMessage.error(res.data.message)
+          }
           console.log(res.data)
         })
         .catch(err => {
@@ -223,17 +236,54 @@ const submitFindPD = () => {
     ElMessage.error("请输入手机号或者邮箱!")
     return
   }
-  findPD_API(account.value)
+  if (password.value === '') {
+    ElMessage.error("请输入密码!")
+    return
+  }
+  if (code.value === '') {
+    ElMessage.error("请输入验证码!")
+    return
+  }
+  findPD_API(account.value, password.value, code.value)
     .then(res => {
       if (res.data.code === 200) {
-        ElMessage.success("发送成功!")
+        ElMessage.success("密码重置成功")
+        code.value = ''
+        is_findPW.value = false
       } else {
         ElMessage.error(res.data.message)
       }
     })
     .catch(err => {
-
     })
+}
+
+const getcodeForPW = () => {
+  if (account.value === "") {
+    ElMessage.error("请输入手机或者邮箱!")
+    return
+  }
+  if (emailValidator(account.value)) {
+    getVerificationCode_API(account.value, "email")
+      .then(res => {
+        if (res.data.code === 200) {
+          ElMessage.success("发送成功!")
+        } else {
+          ElMessage.error(res.data.message)
+        }
+      })
+      .catch(err => {
+      })
+  }
+  else if (phoneNumberStyle(account.value)) {
+    ElMessage.error("暂不支持手机找回")
+    return
+  }
+  else {
+    ElMessage.error("请输入有效手机或者邮箱账号")
+    return
+  }
+
 }
 </script>
 

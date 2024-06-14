@@ -185,10 +185,10 @@ const feedBackList = ref<{
 }[]>([])
 
 const toWord = async () => {
-    // if (activity.value.state !== '已结束') {
-    //     ElMessage.warning('活动还未结束')
-    //     return
-    // }
+    if (activity.value.state !== '已结束') {
+        ElMessage.warning('活动还未结束')
+        return
+    }
 
     ElMessage.success('正在生成word文件')
     const activityReport = {

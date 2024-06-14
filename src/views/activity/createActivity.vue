@@ -43,6 +43,7 @@ import { useUserStore } from '@/store/user';
 import { ElMessage } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router';
 const temp_select = ref('自定义')
 
 watch(
@@ -95,8 +96,11 @@ const fetchActivityTemplates = () => {
 onMounted(() => {
     fetchActivityTemplates()
 })
+
+
 const { currentUser } = storeToRefs(useUserStore())
-const createActivity = () => {
+const createActivity = async () => {
+
     if (activity.value.name == '') {
         ElMessage.error('请输入活动标题')
         return
@@ -108,18 +112,21 @@ const createActivity = () => {
     activity.value.start_time = start_end.value![0].toString()
     activity.value.end_time = start_end.value![1].toString()
     activity.value.creator_id = currentUser.value.id
-    createActivity_API(activity.value)
+
+    await createActivity_API(activity.value)
         .then(res => {
             if (res.data.code === 200) {
+                console.log(res.data.data)
                 ElMessage.success('创建成功')
+                window.location.replace(`/activity/${res.data.data}`)
             }
             else {
                 ElMessage.error('创建失败')
             }
         })
         .catch(err => {
-
         })
+
 }
 
 </script>

@@ -75,20 +75,20 @@ const { currentUser } = storeToRefs(useUserStore())
         <li @click="router.push('/')" class="bar-activity">
           <span>首页</span>
         </li>
-        <li @click="router.push('/user')" class="bar-activity">
+        <!-- <li @click="router.push('/user')" class="bar-activity">
           <span>个人界面</span>
-        </li>
+        </li> -->
         <li class="search-bar myCenter">
           <el-input v-model="search_key" placeholder="搜索活动" class="search-input" @keydown="searchEnter" />
           <el-icon size="25px" @click="navToSearch()" class="search-icon">
             <Search />
           </el-icon>
         </li>
-        <li class="adminEnter" @click="router.push({
+        <!-- <li class="adminEnter" @click="router.push({
           name: 'activity', params: { id: 123 }
         })">
           活动详情页
-        </li>
+        </li> -->
         <li class="adminEnter" @click="router.push('/back')" v-if="currentUser.is_admin">
           后台
         </li>

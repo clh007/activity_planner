@@ -53,6 +53,9 @@ const addSchedule = () => {
             if (res.data.code === 200) {
                 ElMessage.success("添加成功")
             }
+            else {
+                ElMessage.error(res.data.message)
+            }
         })
         .catch(err => {
         })

@@ -354,11 +354,12 @@ const openFeeListDia = (index: number) => {
         })
         .catch(err => {
         })
+
 }
 
 const chargeFrm = ref({
     activity_id: 0,
-    booking_fee: 0,
+    booking_fee: 1000,
     actual_fee: 0,
 })
 

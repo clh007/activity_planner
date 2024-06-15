@@ -4,7 +4,10 @@ import axios from "axios";
 import { ElMessage } from "element-plus";
 
 const instance = axios.create({
-    baseURL: "http://localhost:8080/api",
+    // baseURL: "http://localhost:8080/api",
+    baseURL: "https://93f02i3484.goho.co/api",
+    // baseURL: import.meta.env.VITE_BASE_URL + '/api',
+    // timeout: 5000,
 })
 /**
  * 使用axios拦截器来拦截HTTP请求。

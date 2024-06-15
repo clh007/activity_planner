@@ -46,17 +46,18 @@ export default defineConfig({
 
   },
   server: {
-    // proxy:{
-    //   '/api':{
+    // proxy: {
+    //   '/api': {
     //     target: 'http://localhost:8080',
     //     changeOrigin: true,
-    //     rewrite:path => path.replace(/^\/api/, ''),
+    //     rewrite: path => path.replace(/^\/api/, ''),
     //   }
     // }
   },
   base: '/activity_planner/',
-  // base: "./",
+  // base: "/",
   build: {
     outDir: 'docs',
-  }
+  },
+
 })
